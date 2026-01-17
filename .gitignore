@@ -1,1 +1,33 @@
-/Manifest*.toml
+# System Files
+.DS_Store
+Thumbs.db
+
+# Julia
+Manifest.toml
+*.jl.cov
+*.jl.mem
+
+# Mathematica / MMA
+*.nb-
+*.bak
+*.mx
+
+# Simulation Data (These are usually too large for GitHub)
+*.h5
+*.mat
+*.csv
+*.txt
+Results/
+Data/
+*/Results/*
+*/Data/*
+
+# Animations & Videos
+*.mp4
+*.mov
+*.gif
+
+# Figures (Optional - keeps the repo clean)
+*.png
+*.pdf
+*.jpg
