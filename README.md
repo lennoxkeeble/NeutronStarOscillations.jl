@@ -1,7 +1,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/lennoxkeeble/NeutronStarOscillations/blob/main/LICENSE)
 ![GitHub last commit](https://img.shields.io/github/last-commit/lennoxkeeble/NeutronStarOscillations)
 [![Build Status](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml?query=branch%3Amain)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7341de9 (Deleted .jl files from examples)
 
 # NeutronStarOscillations
 [Code in constant development]
