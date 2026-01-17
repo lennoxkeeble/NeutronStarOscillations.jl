@@ -7,7 +7,7 @@
 
 =#
 
-using Revise
+# using Revise
 using NeutronStarOscillations
 using LaTeXStrings
 
@@ -68,10 +68,10 @@ dt_save_ms = total_time_ms / 100.0; # time interval between saved data points [m
 save_every = 50; # save to file after 'save_every' time steps have been stored in memory (i.e., after every Δt = save_every * dt_save_ms) — (Int64)
 
 # file name conventions
-data_path = "/Users/lennoxkeeble/.julia/dev/NeutronStarOscillations/Results/Data/"; # path to save data files — (String)
-fig_path = "/Users/lennoxkeeble/.julia/dev/NeutronStarOscillations/Results/Figures/"; # path to save figure files — (String)
-mkpath(data_path);
-mkpath(fig_path);
+data_path = "../../Results/Data/";
+fig_path  = "../../Results/Figures/";
+mkpath(data_path)
+mkpath(fig_path)
 
 #################### CREATING STAR OBJECTS ####################
 # set all viscous parameters to zero for perfect fluid star as well as KO since only used in time integration of BDNK equations

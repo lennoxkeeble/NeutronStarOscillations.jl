@@ -857,7 +857,84 @@ end
     Makie.inline!(true)
     # --- END OF SILENCER ---
     @compile_workload begin
-        include("./Examples/params.jl")
+
+        #################### PARAMS.JL ####################
+        using NeutronStarOscillations
+        using LaTeXStrings
+
+        #################### STELLAR PARAMETERS ####################
+        eps_central = 3.0e15; # central energy density [g/cm^3] — (Float64)
+
+        # polytropic parameter for equation of state p = κ * ε^(1 + 1 / n)
+        n = 0.8; # polytropic index — (Float64)
+        kappa = 700.0; # polytropic prefactor [km^(-2 / n)] — (Float64)
+
+        # viscous parameters
+        η = 1.0e-4; # dimensionless shear viscosity parameter — (Float64) 
+        ζ = 1.0e-4; # dimensionless bulk viscosity parameter — (Float64)
+        τε = 10.0; # dimensionless relaxation time parameter — (Float64)
+        τP = 1.0; # dimensionless relaxation time parameter — (Float64)
+        τQ = 5.0; # dimensionless relaxation time parameter — (Float64)
+        L = 1.0; # length scale associated with viscous parameters [km] — (Float64)
+
+        #################### NUMERICAL PARAMETERS ####################
+        ptol = -1e-6; # pressure at which to terminate integration in TOV and frequency domain code [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol * p(r=0) — (Float64)
+        ptol_TD = -1e-3; # pressure at which to terminate integration for time domain solver [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol_TD * p(r=0) — (Float64)
+
+        # TOV-solver specific numerical parameters for implicit solver
+        TOV_iter_tol = 1e-15; # tolerance for Newton iteration in implicit solver — (Float64)
+        TOV_max_iter = 10; # maximum number of iterations in implicit solver — (Int64)
+        TOV_max_steps = Int(1e11); # maximum number of steps to take in the solver — (Int64)
+        TOV_initial_r = 1e-15; # initial radius for implicit solver [km] — (Float64)
+
+        # frequency domain numerical parameters
+        NL_reltol = 1e-6; # NonlinearSolve relative tolerance (used for iteration of shooting method integration to satisfy boundary conditions) — (Float64)
+        NL_abstol = 1e-6; # NonlinearSolve absolute tolerance (used for iteration of shooting method integration to satisfy boundary conditions) — (Float64)
+        NL_maxiter = 200; # maximum number of NonlinearSolve iterations — (Int64)
+        N_eigvals = 5; # number of eigenvalue-eigenvector pairs to compute — (Int64)
+
+        #= 
+            time domain initial data functions. In the Eckart case, u1 is the Lagrangian displacement. In the BDNK case, u1 is the radial velocty perturbation.
+            In both cases we assume stationary initial data (i.e., time derivatives of perturbations are zero at t=0). The example scripts show different options for
+            specifying initial data. Below is the most basic version where one directly specifies δu and its radial derivative. We provide in built functions for
+            the Gaussian (so one just specifies the amplitude, center, and width) as well as an option for using the perfect fluid eigenvectors as initial data.
+        =#
+
+        Gaussian_amplitude = 1e-5; # amplitude of Gaussian initial data — (Float64)
+        Gaussian_center = 5.0; # center of Gaussian initial data [km] — (Float64)
+        Gaussian_width = 0.5; # width of Gaussian initial data [km] — (Float64)
+        gaussian(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = A/exp((r - r0)^2/w^2)
+        gaussian_prime(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = (2*A*(-r + r0))/(exp((r - r0)^2/w^2)*w^2)
+
+        xi_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for Lagrangian displacement (ξ) (used by perfect fluid / Eckart) — (Function)
+        du_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for perturbation of radial component of four-velocity (δu) (used by full BDNK) — (Function)
+        ddu_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for radial derivative of δu (used by full BDNK) — (Function)
+
+        # time domain numerical parameters
+        KO = 0.1; # Kreiss-Oliger dissipation coefficient for BDNK evolution — (Float64)
+        CFL = 0.1; # Courant-Friedrichs-Lewy factor — (Float64)
+        h_save = 4e-2; # spatial grid spacing for saved data points [km] — (Float64)
+        total_time_ms = 0.05; # total integration time [ms] — (Float64)
+        dt_save_ms = total_time_ms / 100.0; # time interval between saved data points [ms] — (Float64)
+        save_every = 50; # save to file after 'save_every' time steps have been stored in memory (i.e., after every Δt = save_every * dt_save_ms) — (Int64)
+
+        # file name conventions
+        package_root = pkgdir(@__MODULE__) 
+        data_path = joinpath(package_root, "Results", "Data", "")
+        fig_path  = joinpath(package_root, "Results", "Figures", "")
+        mkpath(data_path)
+        mkpath(fig_path)
+
+        #################### CREATING STAR OBJECTS ####################
+        # set all viscous parameters to zero for perfect fluid star as well as KO since only used in time integration of BDNK equations
+        PF_star = NeutronStarOscillations.Star(eps_central, kappa, n, 0.0, 0.0, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+
+        # set relaxation times to zero for Eckart star as well as KO since only used in time integration of BDNK equations
+        Eckart_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+
+        # BDNK star
+        BDNK_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+
 
         # adjust star parameters to make runs faster
         h_save = 1e-1;
