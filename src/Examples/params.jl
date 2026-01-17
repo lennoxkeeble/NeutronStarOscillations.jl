@@ -7,7 +7,7 @@
 
 =#
 
-using Revise
+# using Revise
 using NeutronStarOscillations
 using LaTeXStrings
 
@@ -69,8 +69,8 @@ save_every = 50; # save to file after 'save_every' time steps have been stored i
 
 # file name conventions
 package_root = pkgdir(@__MODULE__) 
-data_path = joinpath(package_root, "Results", "Data")
-fig_path  = joinpath(package_root, "Results", "Figures")
+data_path = joinpath(package_root, "Results", "Data", "")
+fig_path  = joinpath(package_root, "Results", "Figures", "")
 mkpath(data_path)
 mkpath(fig_path)
 
