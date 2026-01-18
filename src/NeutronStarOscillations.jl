@@ -54,8 +54,9 @@ mutable struct Star
     h_save::Float64 # spatial grid spacing for saved data points [km]
     save_every::Int64 # save to file after 'save_every' time steps have been stored in memory (i.e., after every Δt = save_every * dt_save)
     T::Float64 # total integration time [ms]
+    mode::Int64 # mode to evolve in time domain (-1 if not using frequency domain eigenvector as initial data)
     # checks to make sure that the parameters are valid
-    Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T) = begin
+    Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T, mode) = begin
     if εc_cgs <= 0.0 || εc_SI <= 0.0
         error("Central energy density must be > 0.")
     elseif pc_SI <= 0.0
@@ -111,8 +112,10 @@ mutable struct Star
         error("Parameter 'save_every' must be a positive integer.")
     elseif T <= 0.0
         error("Total integration time 'T' must be > 0.")
+    elseif mode < -1
+        error("Mode to evolve in time domain 'mode' must be >= -1.")
     else
-        new(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T)
+        new(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T, mode)
     end
     end
 end
@@ -150,7 +153,7 @@ function Star(
     dt_save::Float64,
     h_save::Float64,
     save_every::Int64,
-    T::Float64)::Star
+    T::Float64; mode::Int64 = -1)::Star
 
     γ = 1.0 + 1.0/n;
     EOS_ε(p::Float64)::Float64 = (p / kappa)^(1/γ) 
@@ -169,7 +172,7 @@ function Star(
         ptol_TD = abs(ptol_TD) * pc_SI
     end
 
-    return Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T)
+    return Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T, mode)
 end
 
 # convenience constructor that uses Gaussian initial data for time domain simulations
@@ -203,7 +206,8 @@ function Star(
     dt_save::Float64,
     h_save::Float64,
     save_every::Int64,
-    T::Float64)::Star
+    T::Float64;
+    mode::Int64 = -1)::Star
 
     gaussian(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = A/exp((r - r0)^2/w^2)
     gaussian_prime(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = (2*A*(-r + r0))/(exp((r - r0)^2/w^2)*w^2)
@@ -214,7 +218,7 @@ function Star(
     # δε_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
     # dδε_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width);
 
-    return Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T)
+    return Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode)
 end
 
 
@@ -788,24 +792,51 @@ function Star(
     ξ_ID(r::Float64)::Float64 = 0.0
     δu_ID(r::Float64)::Float64 = 0.0
     dδu_dr_ID(r::Float64)::Float64 = 0.0
-    star = Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T)
+    star = Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode)
 
     # create a new star with relaxation times set to zero (since we only have frequency domain methods for PF and Eckart stars)
-    star_FD = Star(εc_cgs, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T);
+    star_FD = Star(εc_cgs, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode);
     star_FD.τε = 0.0
     star_FD.τP = 0.0
     star_FD.τQ = 0.0
 
     # compute and load eigensystem
     N_eigvals = mode + 1; # compute up to and including desired mode
-    compute_eigensystem(star_FD, h_shoot, h_TOV, N_eigvals, nPointsMatrix, cowling; print_progress = false)
-    init_freqs, shooting_freqs, r, evecs, resids, ret = load_eigensystem(star_FD, h_shoot, cowling)
 
-    # lagrangian displacement initial data
-    y1 = real.(evecs[:, mode + 1][:])
+    local r, y1, y2
 
-    # velocity perturbation initial data, since δu = ∂_{t} ξ = -iω * ξ
-    y2 = real.(-im * shooting_freqs[mode + 1] * evecs[:, mode + 1][:])
+    # only for a PF star can cowling = true (since no FD methods for Eckart cowling)
+    if ζ == 0.0 && η == 0.0 && τε == 0.0 && τP == 0.0 && τQ == 0.0
+        nothing
+    else
+        cowling = false
+    end
+
+    # try to load from file, if it exists. (Note that even if the file exists, it may not contain enough modes, hence the extend of the catch block.)
+    try
+        init_freqs, shooting_freqs, r, evecs, resids, ret = load_eigensystem(star_FD, h_shoot, cowling)
+
+        # lagrangian displacement initial data
+        y1 = real.(evecs[:, mode + 1][:])
+
+        # velocity perturbation initial data, since δu = ∂_{t} ξ = -iω * ξ
+        y2 = real.(-im * shooting_freqs[mode + 1] * evecs[:, mode + 1][:])
+
+        # normalize y2
+        y2 .= y2 ./ abs(y2[end])
+    catch e
+        compute_eigensystem(star_FD, h_shoot, h_TOV, N_eigvals, nPointsMatrix, cowling; print_progress = false)
+        init_freqs, shooting_freqs, r, evecs, resids, ret = load_eigensystem(star_FD, h_shoot, cowling)
+
+        # lagrangian displacement initial data
+        y1 = real.(evecs[:, mode + 1][:])
+
+        # velocity perturbation initial data, since δu = ∂_{t} ξ = -iω * ξ
+        y2 = real.(-im * shooting_freqs[mode + 1] * evecs[:, mode + 1][:])
+
+        # normalize y2
+        y2 .= y2 ./ abs(y2[end])
+    end
 
     # interpolate
     ξ_spline = Spline1D(r, y1; k=NeutronStarOscillations.FrequencyDomain.spline_order, s=NeutronStarOscillations.FrequencyDomain.s, bc=NeutronStarOscillations.FrequencyDomain.bc)
@@ -1281,6 +1312,9 @@ end
             fix_ylims = false, # whether to fix y-limits of plot
         )        
         
+        mode = 0; cowling = false;
+        eigvec_ID_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, mode, cowling, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+
     end
 end
 

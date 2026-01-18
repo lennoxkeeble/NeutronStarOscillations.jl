@@ -7,7 +7,7 @@
 
 =#
 
-# using Revise
+using Revise
 using NeutronStarOscillations
 using LaTeXStrings
 
@@ -68,8 +68,8 @@ dt_save_ms = total_time_ms / 100.0; # time interval between saved data points [m
 save_every = 50; # save to file after 'save_every' time steps have been stored in memory (i.e., after every Δt = save_every * dt_save_ms) — (Int64)
 
 # file name conventions
-data_path = "../../Results/Data/";
-fig_path  = "../../Results/Figures/";
+data_path = "./Results/Data/";
+fig_path  = "./Results/Figures/";
 mkpath(data_path)
 mkpath(fig_path)
 

@@ -19,10 +19,38 @@ using HDF5
 
 
 one_norm(x::AbstractArray) = sum(abs, x) / length(x)
-td_fname(star::NeutronStarOscillations.Star, h::Float64)::String = star.data_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_h_%.1e.h5", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, h);
-plot_fname(star::NeutronStarOscillations.Star, h::Float64, var::String, time::Float64)::String = star.fig_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_h_%.1e_%s_time_%.2f.png", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, h, var, time);
-animation_fname(star::NeutronStarOscillations.Star, h::Float64, var::String)::String = star.fig_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_h_%.1e_%s.mp4", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, h, var);
-convergence_plot_fname(star::NeutronStarOscillations.Star, var::String)::String = star.fig_path * @sprintf("Cowling_time_domain_%s_convergence_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s.png", var, star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T);
+function td_fname(star::NeutronStarOscillations.Star, h::Float64)::String
+    if star.mode == -1
+        return star.data_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_h_%.1e.h5", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, h);
+    else
+        return star.data_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_mode_%s_h_%.1e.h5", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, star.mode, h);
+    end
+end
+
+function plot_fname(star::NeutronStarOscillations.Star, h::Float64, var::String, time::Float64)::String
+    if star.mode == -1
+        return star.fig_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_h_%.1e_%s_time_%.2f.png", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, h, var, time);
+    else
+        return star.fig_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_mode_%s_h_%.1e_%s_time_%.2f.png", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, star.mode, h, var, time);
+    end
+end
+
+function animation_fname(star::NeutronStarOscillations.Star, h::Float64, var::String)::String
+    if star.mode == -1
+        return star.fig_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_h_%.1e_%s.mp4", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, h, var);
+    else
+        return star.fig_path * @sprintf("Cowling_time_domain_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_mode_%s_h_%.1e_%s.mp4", star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, star.mode, h, var);
+    end
+end
+
+function convergence_plot_fname(star::NeutronStarOscillations.Star, var::String)::String
+    if star.mode == -1
+        return star.fig_path * @sprintf("Cowling_time_domain_%s_convergence_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s.png", var, star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T);
+    else
+        return star.fig_path * @sprintf("Cowling_time_domain_%s_convergence_κ_%d_n_%.1f_εc_%.2e_ptol_%.2e_η_%.1e_ζ_%.1e_τε_%.1e_τP_%.1e_τQ_%.1e_L_%s_KO_%s_CFL_%s_T_%s_mode_%s.png", var, star.kappa, star.n, star.εc_SI, star.ptol_TD, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, star.KO, star.CFL, star.T, star.mode);
+    end
+end
+
 
 function load_solution(star::NeutronStarOscillations.Star, h::Float64)
     filename = td_fname(star, h);
