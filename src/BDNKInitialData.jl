@@ -55,8 +55,7 @@ du2_dr(u1::Float64, u2::Float64, u3::Float64, du1_dr::Float64, m::Float64, p::Fl
 du3_dr(u1::Float64, u2::Float64, u3::Float64, du1_dr::Float64, m::Float64, p::Float64, ε::Float64, ν::Float64, cs::Float64, cs_prime::Float64, r::Float64, η::Float64, ζ::Float64, τε::Float64, τP::Float64, τQ::Float64, L::Float64)::Float64 = (8*π*r^2*(r - 2*m)*u2 + (r - 2*m)*u3*(-1 + 8*π*r^2*ε) - (8*L*π*r*(3*ζ + 4*η)*τε*(p + ε)*(4*π*r^3*p*u1 - r*cs^2*(u1*(2 + 4*π*r^2*ε) + r*du1_dr) + m*(u1*(1 + 5*cs^2) + 2*r*cs^2*du1_dr)))/(3.0*exp(ν/2.)*cs^2))/(r - 2*m)^2
 
 function compute_initial_data(star::NeutronStarOscillations.Star, h::Float64; u2_0::Float64=1e-6, return_all = false)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h; TD=true);
-    r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.load(star, h; TD=true);
+    r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.solve(star, h; TD=true, save_to_file=false);
 
     TOV_length = length(m);
     cs = [sqrt(star.dp_dε(ε[i])) for i in 1:TOV_length];

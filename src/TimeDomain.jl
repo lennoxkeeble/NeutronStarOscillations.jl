@@ -564,8 +564,7 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
 
     ################ SOLVE FOR TOV BACKGROUND ################
     h_TOV = 1e-4 < h ? 1e-4 : h;
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; TD=true);
-    r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV; TD=true);
+    r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; TD=true, save_to_file=false);
 
     TOV_length = length(m);
     cs = [sqrt(star.dp_dε(ε[i])) for i in 1:TOV_length];

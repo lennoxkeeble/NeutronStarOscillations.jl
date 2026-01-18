@@ -161,10 +161,8 @@ cs_prime_func(m::Float64, p::Float64, ε::Float64, cs::Float64, r::Float64, d2p_
 cs_prime_func(m::Float64, p::Float64, ε::Float64, cs::Float64, r::Float64, d2p_dε2::Float64)::Float64 = d2p_dε2 * p_prime(m, p, ε, r) / (2 * cs^3)
 
 function get_eigensystem(star::NeutronStarOscillations.Star, nPoints::Int64, h_TOV::Float64, N_eigvals::Int64)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
-
     # first run TOV solution at higher resolution than h
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r_matrix = range(start = 0.0, stop = Rs, length = nPoints) |> collect;
@@ -240,10 +238,8 @@ function load_eigensystem(star::NeutronStarOscillations.Star, nPoints::Int64)
 end
 
 function get_eigenvalues(star::NeutronStarOscillations.Star, nPoints::Int64, h_TOV::Float64, N_eigvals::Int64)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
-
     # first run TOV solution at higher resolution than h
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r_matrix = range(start = 0.0, stop = Rs, length = nPoints) |> collect;
@@ -347,8 +343,7 @@ function get_eigensystem(star::NeutronStarOscillations.Star, h_shoot::Float64, h
     ω_init = matrix_freqs * (2π * kHz_to_km)^2
 
     # compute high resolution TOV solution and interpolate to desired computational grid
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r = range(start = 0.0, stop = Rs, step = h_shoot) |> collect;
@@ -706,10 +701,8 @@ cs_prime_func(m::Float64, p::Float64, ε::Float64, cs::Float64, r::Float64, d2p_
 cs_prime_func(m::Float64, p::Float64, ε::Float64, cs::Float64, r::Float64, d2p_dε2::Float64)::Float64 = d2p_dε2 * p_prime(m, p, ε, r) / (2 * cs^3)
 
 function get_eigensystem(star::NeutronStarOscillations.Star, nPoints::Int64, h_TOV::Float64, N_eigvals::Int64)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
-
     # first run TOV solution at higher resolution than h
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r_matrix = range(start = 0.0, stop = Rs, length = nPoints) |> collect;
@@ -783,10 +776,9 @@ function load_eigensystem(star::NeutronStarOscillations.Star, nPoints::Int64)
 end
 
 function get_eigenvalues(star::NeutronStarOscillations.Star, nPoints::Int64, h_TOV::Float64, N_eigvals::Int64)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
 
     # first run TOV solution at higher resolution than h
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r_matrix = range(start = 0.0, stop = Rs, length = nPoints) |> collect;
@@ -911,8 +903,7 @@ function get_eigensystem(star::NeutronStarOscillations.Star, h_shoot::Float64, h
     ω_init = matrix_freqs * (2π * kHz_to_km)^2
 
     # compute high resolution TOV solution and interpolate to desired computational grid
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r = range(start = 0.0, stop = Rs, step = h_shoot) |> collect;
@@ -1260,10 +1251,9 @@ const kHz_to_km = 1e3 / sec_to_km;
 
 
 function get_eigensystem(star::NeutronStarOscillations.Star, nPoints::Int64, h_TOV::Float64, N_eigvals::Int64)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
 
     # first run TOV solution at higher resolution than h
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r_matrix = range(start = 0.0, stop = Rs, length = nPoints) |> collect;
@@ -1287,10 +1277,9 @@ function get_eigensystem(star::NeutronStarOscillations.Star, nPoints::Int64, h_T
 end
 
 function get_eigenvalues(star::NeutronStarOscillations.Star, nPoints::Int64, h_TOV::Float64, N_eigvals::Int64)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
 
     # first run TOV solution at higher resolution than h
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r_matrix = range(start = 0.0, stop = Rs, length = nPoints) |> collect;
@@ -1568,8 +1557,7 @@ function get_eigensystem(star::NeutronStarOscillations.Star, h_shoot::Float64, h
     ω_init = matrix_freqs * (2π * kHz_to_km)
 
     # compute high resolution TOV solution and interpolate to desired computational grid
-    NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV); # explicit RK4 solver (fourth-order accurate)
-    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.load(star, h_TOV);
+    r_TOV, m_TOV, p_TOV, ε_TOV, ν_TOV = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; save_to_file=false);
 
     Rs = r_TOV[end];
     r = range(start = 0.0, stop = Rs, step = h_shoot) |> collect;

@@ -190,11 +190,11 @@ end
 @inline n0_prime(r::Float64, p::Float64, ε::Float64, m::Float64, ε_prime::Float64, βn::Float64, βε::Float64)::Float64 = -((βε*ε_prime)/βn)
 
 # EOS::Function is an equation of state ε = ε(p)
-function solve(star::NeutronStarOscillations.Star, h::Float64; pressure_floor_fix::Bool=false, fixed_mass_dp::Bool=false, mass_tol::Float64=0.001, TD::Bool=false)
+function solve(star::NeutronStarOscillations.Star, h::Float64; pressure_floor_fix::Bool=false, fixed_mass_dp::Bool=false, mass_tol::Float64=0.001, TD::Bool=false, save_to_file::Bool=true)
     if TD
-        solve(star.EOS_ε, star.εc_SI, star.pc_SI, h, star.TOV_max_steps, star.ptol_TD; save_to_file=true, fname=Explicit.fname(star, h; TD=TD), pressure_floor_fix=pressure_floor_fix, fixed_mass_dp=fixed_mass_dp, mass_tol=mass_tol)
+        solve(star.EOS_ε, star.εc_SI, star.pc_SI, h, star.TOV_max_steps, star.ptol_TD; save_to_file=save_to_file, fname=Explicit.fname(star, h; TD=TD), pressure_floor_fix=pressure_floor_fix, fixed_mass_dp=fixed_mass_dp, mass_tol=mass_tol)
     else
-        solve(star.EOS_ε, star.εc_SI, star.pc_SI, h, star.TOV_max_steps, star.ptol; save_to_file=true, fname=Explicit.fname(star, h; TD=TD), pressure_floor_fix=pressure_floor_fix, fixed_mass_dp=fixed_mass_dp, mass_tol=mass_tol)
+        solve(star.EOS_ε, star.εc_SI, star.pc_SI, h, star.TOV_max_steps, star.ptol; save_to_file=save_to_file, fname=Explicit.fname(star, h; TD=TD), pressure_floor_fix=pressure_floor_fix, fixed_mass_dp=fixed_mass_dp, mass_tol=mass_tol)
     end
 end
 

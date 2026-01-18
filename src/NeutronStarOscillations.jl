@@ -682,8 +682,8 @@ end
 
 
 ## TOV equations ##
-function solve_TOV(star::NeutronStarOscillations.Star, h::Float64)
-    NeutronStarOscillations.TOV.Explicit.solve(star, h);
+function solve_TOV(star::NeutronStarOscillations.Star, h::Float64; save_to_file::Bool = true)
+    NeutronStarOscillations.TOV.Explicit.solve(star, h; save_to_file=save_to_file);
 end
 
 function load_TOV(star::NeutronStarOscillations.Star, h::Float64)

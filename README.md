@@ -5,6 +5,21 @@
 # NeutronStarOscillations
 [Code in constant development]
 
+## Citation 
+
+If you use this code in your work, please cite the following reference:
+
+```
+@article{Keeble:2026
+    author = "Keeble, Lennox and Redondo-Yuste, Jaime",
+    title = "{}",
+    eprint = "26",
+    archivePrefix = "arXiv",
+    primaryClass = "gr-qc",
+    year = "2026"
+}
+```
+
 ## Components ##
 
 ## Limitations and known possible performance issues ##
