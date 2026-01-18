@@ -1113,16 +1113,11 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
     ################ SOLVE FOR INITIAL DATA AND TOV BACKGROUND ################
     # though one is free in the Cowling approximation to choose any initial data for δu, δε, and their time derivatives, we opt to construct the same initial data as in the full BDNK case, i.e., solving for δε having specified δu (and assuming stationary initial data)
     h_TOV = 1e-4;
-    δε_center = 1000.0;
+    δε_center = 0.0;
     r, u2_0, u3_0, u1_0, w1_0, m, p, ε, ν, cs, cs_prime = NeutronStarOscillations.BDNKInitialData.compute_initial_data(star, h_TOV / 2.0; u2_0=δε_center, return_all=true);
     cs_prime[1] = 0.0
     λ = @. -log(1 - 2 * m / r);
     λ[1] = 0.0;
-
-    # normalize initial data so that max(abs.(δε)) = 1.0. Note that we normalize u2 and u3 since we solve a linear ODE for them at t=0, so we can freely rescale them
-    max_abs_δε = maximum(abs.(u2_0));
-    u2_0 .= u2_0 ./ max_abs_δε;
-    u3_0 .= u3_0 ./ max_abs_δε;
 
     cs_prime_prime = zero(cs_prime)
     FiniteDiffOrder4.compute_first_derivative(cs_prime_prime, cs_prime, diff(r)[1], length(r));

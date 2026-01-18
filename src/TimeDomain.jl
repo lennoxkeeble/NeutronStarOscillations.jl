@@ -945,7 +945,7 @@ function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoi
 end
 
 # note that we assume stationary initial data both here and in all time domain functions
-function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Float64 = 1000.0, print_progress::Bool = true)
+function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Float64 = 0.0, print_progress::Bool = true)
     fname = TimeDomain.td_fname(star, h)
     # ensure boundary condition that u1(r=0) = 0 is enforced
     if abs(star.δu_ID(0.0)) > 1e-16
@@ -989,11 +989,6 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
     cs_prime[1] = 0.0
     cs_prime_prime = zero(cs_prime)
     FiniteDiffOrder4.compute_first_derivative(cs_prime_prime, cs_prime, diff(r)[1], length(r));
-
-    # normalize initial data so that max(abs.(δε)) = 1.0. Note that we normalize u2 and u3 since we solve a linear ODE for them at t=0, so we can freely rescale them
-    max_abs_δε = maximum(abs.(u2_0));
-    u2_0 .= u2_0 ./ max_abs_δε;
-    u3_0 .= u3_0 ./ max_abs_δε;
 
     w1_0 = zero(u1_0);
     w2_0 = zero(u2_0);

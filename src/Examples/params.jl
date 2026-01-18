@@ -49,7 +49,7 @@ N_eigvals = 5; # number of eigenvalue-eigenvector pairs to compute — (Int64)
     the Gaussian (so one just specifies the amplitude, center, and width) as well as an option for using the perfect fluid eigenvectors as initial data.
 =#
 
-Gaussian_amplitude = 1e-5; # amplitude of Gaussian initial data — (Float64)
+Gaussian_amplitude = 1.0; # amplitude of Gaussian initial data — (Float64)
 Gaussian_center = 5.0; # center of Gaussian initial data [km] — (Float64)
 Gaussian_width = 0.5; # width of Gaussian initial data [km] — (Float64)
 gaussian(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = A/exp((r - r0)^2/w^2)
