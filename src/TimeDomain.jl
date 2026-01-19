@@ -361,7 +361,7 @@ function plot_initial_data_convergence(star::NeutronStarOscillations.Star, h::Fl
 
     close(sol)
 
-    lim_y_min = 0.0; lim_y_max = 16.0;
+    lim_y_min = 0.0; lim_y_max = 24.0;
     NeutronStarOscillations.QuickPlots.plot11(
         x, y;
         labels = labels,
@@ -372,7 +372,7 @@ function plot_initial_data_convergence(star::NeutronStarOscillations.Star, h::Fl
         framevisible = true,
         lim_y_min = lim_y_min,
         lim_y_max = lim_y_max,
-        hlines = [4.0],
+        hlines = [4.0, 8.0, 16.0],
         )
 end
 
@@ -942,7 +942,7 @@ function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoi
     return coef * (u_plus_2 - 4.0 * u_plus_1 + 6.0 * u - 4.0 * u_minus_1 + u_minus_2) / 16.0
 end
 
-function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Float64 = 0.0, print_progress::Bool = true)
+function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::Bool = true)
     fname = TimeDomain.td_fname(star, h)
     # ensure boundary condition that u1(r=0) = 0 is enforced
     if abs(star.δu_ID(0.0)) > 1e-16
@@ -965,7 +965,7 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
 
     ################ SOLVE FOR INITIAL DATA AND TOV BACKGROUND ################
     # run at high resolutions
-    h_ID = 5e-4
+    h_ID = h
     r_1, u3_lev1 = BDNKInitialData.compute_initial_data(star, 4.0h_ID);
     r_2, u3_lev2 = BDNKInitialData.compute_initial_data(star, 2.0h_ID);
     r_3, u3_lev3 = BDNKInitialData.compute_initial_data(star, 1.0h_ID);
@@ -976,36 +976,11 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
     δλ_spline_2 = Spline1D(r_2, u3_lev2; k=spline_order, s=s);
     δλ_spline_3 = Spline1D(r_3, u3_lev3; k=spline_order, s=s);
 
-    # compute high resolution TOV and desample to user input
-    h_TOV = 1e-4;
-    r, u1_0, u2_0, u3_0, w1_0, w2_0, v1_0, v2_0, m, p, ε, ν, cs, cs_prime = BDNKInitialData.compute_initial_data(star, h_TOV / 2.0; return_all=true);
+    # compute initial data
+    r, u1_0, u2_0, u3_0, w1_0, w2_0, v1_0, v2_0, m, p, ε, ν, cs, cs_prime, cs_prime_prime = BDNKInitialData.compute_initial_data(star, h; return_all=true);
 
-    cs_prime[1] = 0.0
-    cs_prime_prime = zero(cs_prime)
-    FiniteDiffOrder4.compute_first_derivative(cs_prime_prime, cs_prime, diff(r)[1], length(r));
-    
     w3_0 = zero(u3_0);
     FiniteDiffOrder4.compute_first_derivative(w3_0, u3_0, diff(r)[1], length(r));
-
-    # downsample
-    ds_fact = argmin(@. abs(r - h)) - 1;
-    r = r[1:ds_fact:end];
-    diff(r)[1] ≈ h ? nothing : error("Grid spacing does not match desired value of h after downsampling");
-    m = m[1:ds_fact:end];
-    p = p[1:ds_fact:end];
-    ε = ε[1:ds_fact:end];
-    ν = ν[1:ds_fact:end];
-    cs = cs[1:ds_fact:end];
-    cs_prime = cs_prime[1:ds_fact:end];
-    cs_prime_prime = cs_prime_prime[1:ds_fact:end];
-    u1_0 = u1_0[1:ds_fact:end];
-    u2_0 = u2_0[1:ds_fact:end];
-    u3_0 = u3_0[1:ds_fact:end];
-    w1_0 = w1_0[1:ds_fact:end];
-    w2_0 = w2_0[1:ds_fact:end];
-    w3_0 = w3_0[1:ds_fact:end];
-    v1_0 = v1_0[1:ds_fact:end];
-    v2_0 = v2_0[1:ds_fact:end];
     TOV_length = length(m);
 
     # intial data convergence factor

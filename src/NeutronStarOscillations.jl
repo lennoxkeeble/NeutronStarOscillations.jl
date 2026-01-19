@@ -861,11 +861,11 @@ function Star(
     
     ξ_func(r::Float64)::Float64 = ξ_spline(r);
     δu_func(r::Float64)::Float64 = δu_spline(r);
-    dδu_dr_func(r::Float64)::Float64 = derivative(δu_spline, r);
+    δu_dr_func(r::Float64)::Float64 = derivative(δu_spline, r);
 
     star.ξ_ID = ξ_func
     star.δu_ID = δu_func
-    star.δu_dr_ID = dδu_dr_func
+    star.δu_dr_ID = δu_dr_func
     return star
 end
 

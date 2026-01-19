@@ -51,13 +51,31 @@ cs_prime_func(m::Float64, p::Float64, ε::Float64, cs::Float64, r::Float64, d2p_
 du3_dr(u1::Float64, u2::Float64, u3::Float64, du1_dr::Float64, du2_dr::Float64, v1::Float64, v2::Float64, m::Float64, p::Float64, ε::Float64, ν::Float64, cs::Float64, cs_prime::Float64, r::Float64, η::Float64, ζ::Float64, τε::Float64, τP::Float64, τQ::Float64, L::Float64)::Float64 = (L*π*r^4*(3*ζ + 4*η)*τε*(p + ε)*(-384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*p*τQ*u2 - (48*exp(ν/2.)*L*π*(3*ζ + 4*η)*p*τQ*u3)/r - 384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*p^2*τQ*u3 - (48*exp(ν/2.)*L*π*(3*ζ + 4*η)*τQ*u3*ε)/r - 384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*p*τQ*u3*ε + (216*exp(ν/2.)*u2)/(L*r*(3*ζ + 4*η)*τε*(p + ε)) - (27*exp(ν/2.)*u3)/(L*π*r^3*(3*ζ + 4*η)*τε*(p + ε)) + (216*exp(ν/2.)*u3*ε)/(L*r*(3*ζ + 4*η)*τε*(p + ε)) - 768*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*p*τQ*u2*cs^2 + (384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*p*τP*τQ*u2*cs^2)/τε - (48*exp(ν/2.)*L*π*(3*ζ + 4*η)*p*τP*τQ*u3*cs^2)/(r*τε) - 384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*τQ*u2*ε*cs^2 + (384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*τP*τQ*u2*ε*cs^2)/τε - (48*exp(ν/2.)*L*π*(3*ζ + 4*η)*τP*τQ*u3*ε*cs^2)/(r*τε) + (384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*p*τP*τQ*u3*ε*cs^2)/τε + (384*exp(ν/2.)*L*π^2*r*(3*ζ + 4*η)*τP*τQ*u3*ε^2*cs^2)/τε - (1152*exp(ν/2.)*L*π^2*r*ζ*τQ*u2*(p + ε)*cs^2)/τε - (1536*exp(ν/2.)*L*π^2*r*η*τQ*u2*(p + ε)*cs^2)/τε + (144*exp(ν/2.)*L*π*ζ*τQ*u3*(p + ε)*cs^2)/(r*τε) + (192*exp(ν/2.)*L*π*η*τQ*u3*(p + ε)*cs^2)/(r*τε) - (1152*exp(ν/2.)*L*π^2*r*ζ*τQ*u3*ε*(p + ε)*cs^2)/τε - (1536*exp(ν/2.)*L*π^2*r*η*τQ*u3*ε*(p + ε)*cs^2)/τε + (24*u1*(6*r^2*cs^2 + (64*L^2*π^3*r^6*(3*ζ + 4*η)^2*p^2*τQ*(p + ε)*cs^2)/3. - 64*L^2*π^2*r^4*η*(3*ζ + 4*η)*τQ*ε*(p + ε)*cs^4 + 6*m^2*(1 + 5*cs^2) + 4*π*r^4*p*(-3 - 3*cs^2 + (16*L^2*π^2*r^2*(3*ζ + 4*η)^2*τQ*ε*(p + ε)*cs^2)/3. - 16*L^2*π*η*(3*ζ + 4*η)*τQ*(p + ε)*cs^4) + r*m*(-3*(1 + 9*cs^2) + (16*L^2*π^2*r^2*(3*ζ + 4*η)*τQ*ε*(p + ε)*cs^2*(3*ζ + 4*η*(1 + 6*cs^2)))/3. + 8*π*r^2*p*(2*L^2*π*ζ*(3*ζ + 4*η)*τQ*(p + ε)*cs^2 + 3*(1 + cs^2) + (8*L^2*π*η*(3*ζ + 4*η)*τQ*(p + ε)*cs^2*(1 + 6*cs^2))/3.))))/(r^3*(r - 2*m)*cs^2) - 192*exp(ν/2.)*L*π*(3*ζ + 4*η)*τQ*u2*cs*cs_prime + (72*du1_dr)/r - 96*exp(ν/2.)*L*π*(3*ζ + 4*η)*τQ*cs^2*du2_dr - (96*L*π*(3*ζ + 4*η)*p*τQ*v1)/exp(ν/2.) - (96*L*π*(3*ζ + 4*η)*τQ*ε*v1)/exp(ν/2.) + (72*v2)/(r*(p + ε)) - 384*L^2*π^2*r*ζ*(3*ζ + 4*η)*τQ*(p + ε)*cs^2*v2 - 512*L^2*π^2*r*η*(3*ζ + 4*η)*τQ*(p + ε)*cs^2*v2 - (18*m*((3*exp(ν/2.)*u3*(-1 + 8*π*r^2*ε))/(L*π*(3*ζ + 4*η)*τε*(p + ε)) + 8*exp(ν/2.)*r^2*u2*(3/(L*(3*ζ + 4*η)*τε*(p + ε)) + (2*L*π*(3*ζ + 4*η)*τQ*(1 + cs^2 - 4*r*cs*cs_prime))/3.) + 8*r^2*(du1_dr - (4*exp(ν/2.)*L*π*r*(3*ζ + 4*η)*τQ*cs^2*du2_dr)/3. + v2/(p + ε))))/r^4))/(3.0*exp(ν/2.)*(r - 2*m)*(9*r - 18*m + 16*L^2*π^2*r^3*(3*ζ + 4*η)^2*p^2*τP*τQ*cs^2 + 16*L^2*π^2*r^3*(3*ζ + 4*η)^2*τP*τQ*ε^2*cs^2 - 48*L^2*π^2*r^3*ζ*(3*ζ + 4*η)*τQ*ε*(p + ε)*cs^2 - 64*L^2*π^2*r^3*η*(3*ζ + 4*η)*τQ*ε*(p + ε)*cs^2 - 16*L^2*π^2*r^3*(3*ζ + 4*η)^2*p*τQ*(p + ε - 2*τP*ε)*cs^2))
 
 function compute_initial_data(star::NeutronStarOscillations.Star, h::Float64; return_all = false)
-    r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.solve(star, h; TD=true, save_to_file=false);
+    # compute TOV at high resolution
+    h_TOV = 1e-5;
+    r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV / 2.0; TD=true, save_to_file=false);
 
     TOV_length = length(m);
     cs = [sqrt(star.dp_dε(ε[i])) for i in 1:TOV_length];
     cs_prime = [cs_prime_func(m[i], p[i], ε[i], cs[i], r[i], star.d2p_dε2) for i in 1:TOV_length];
     cs_prime[1] = 0.0
+    cs_prime_prime = zero(cs_prime)
+    FiniteDiffOrder4.compute_first_derivative(cs_prime_prime, cs_prime, diff(r)[1], length(r));
 
+    # downsample to user specified h divided by two (this is because the RK4 integration will solve at steps of 2h_TOV)
+    ds_fact = argmin(@. abs(r - h/2)) - 1;
+    r = r[1:ds_fact:end];
+    diff(r)[1] ≈ h/2 ? nothing : error("Grid spacing does not match desired value of h after downsampling");
+    m = m[1:ds_fact:end];
+    p = p[1:ds_fact:end];
+    ε = ε[1:ds_fact:end];
+    ν = ν[1:ds_fact:end];
+    cs = cs[1:ds_fact:end];
+    cs_prime = cs_prime[1:ds_fact:end];
+    cs_prime_prime = cs_prime_prime[1:ds_fact:end];
+    TOV_length = length(m);
+
+    # evaluate initial data functions
     u1_arr = @. star.δu_ID(r);
     u2_arr = @. star.δε_ID(r);
     w1_arr = @. star.δu_dr_ID(r);
@@ -72,7 +90,7 @@ function compute_initial_data(star::NeutronStarOscillations.Star, h::Float64; re
         
         isapprox(r[1:2:TOV_final_idx], r_ds, atol=1e-12) || error("Radial grid points do not match between TOV solution and initial data solution.")
         
-        return r_ds, u1_arr[1:2:TOV_final_idx], u2_arr[1:2:TOV_final_idx], u3, w1_arr[1:2:TOV_final_idx], w2_arr[1:2:TOV_final_idx], v1_arr[1:2:TOV_final_idx], v2_arr[1:2:TOV_final_idx], m[1:2:TOV_final_idx], p[1:2:TOV_final_idx], ε[1:2:TOV_final_idx], ν[1:2:TOV_final_idx], cs[1:2:TOV_final_idx], cs_prime[1:2:TOV_final_idx]
+        return r_ds, u1_arr[1:2:TOV_final_idx], u2_arr[1:2:TOV_final_idx], u3, w1_arr[1:2:TOV_final_idx], w2_arr[1:2:TOV_final_idx], v1_arr[1:2:TOV_final_idx], v2_arr[1:2:TOV_final_idx], m[1:2:TOV_final_idx], p[1:2:TOV_final_idx], ε[1:2:TOV_final_idx], ν[1:2:TOV_final_idx], cs[1:2:TOV_final_idx], cs_prime[1:2:TOV_final_idx], cs_prime_prime[1:2:TOV_final_idx]
     else
         return r_ds, u3
     end
