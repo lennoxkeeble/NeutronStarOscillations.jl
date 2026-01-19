@@ -552,7 +552,6 @@ function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoi
     return coef * (u_plus_2 - 4.0 * u_plus_1 + 6.0 * u - 4.0 * u_minus_1 + u_minus_2) / 16.0
 end
 
-# note that we assume stationary initial data both here and in all time domain functions
 function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::Bool=true)
     fname = CowlingTimeDomain.td_fname(star, h)
     if abs(star.ξ_ID(0.0)) > 1e-16
@@ -610,7 +609,7 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
     ################ SET UP INITIAL DATA ################
     nPointsSpace = TOV_length;
     u1_0 = @. star.ξ_ID(r); # ξ
-    v1_0 = zero(r); # ∂ξ/∂t — # assume stationary initial data
+    v1_0 = @. star.ξ_dt_ID(r); # ∂ξ/∂t
 
     if isfile(fname)
         print_progress ? println("File $fname already exists and will be overwritten.") : nothing
@@ -1090,7 +1089,6 @@ function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoi
     return coef * (u_plus_2 - 4.0 * u_plus_1 + 6.0 * u - 4.0 * u_minus_1 + u_minus_2) / 16.0
 end
 
-# note that we assume stationary initial data both here and in all time domain functions
 function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::Bool=true)
     fname = CowlingTimeDomain.td_fname(star, h)
     if abs(star.δu_ID(0.0)) > 1e-16
@@ -1110,11 +1108,13 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
     save_times = range(start = dt_save, step = dt_save, stop = total_time) |> collect
     save_time_idx = [argmin(@. abs(time_steps - save_times[i])) for i in eachindex(save_times)];
 
-    ################ SOLVE FOR INITIAL DATA AND TOV BACKGROUND ################
-    # though one is free in the Cowling approximation to choose any initial data for δu, δε, and their time derivatives, we opt to construct the same initial data as in the full BDNK case, i.e., solving for δε having specified δu (and assuming stationary initial data)
+    ################ TOV BACKGROUND ################
     h_TOV = 1e-4;
-    δε_center = 0.0;
-    r, u2_0, u3_0, u1_0, w1_0, m, p, ε, ν, cs, cs_prime = NeutronStarOscillations.BDNKInitialData.compute_initial_data(star, h_TOV / 2.0; u2_0=δε_center, return_all=true);
+    r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV; TD=true, save_to_file=false);
+
+    TOV_length = length(m);
+    cs = [sqrt(star.dp_dε(ε[i])) for i in 1:TOV_length];
+    cs_prime = [cs_prime_func(m[i], p[i], ε[i], cs[i], r[i], star.d2p_dε2) for i in 1:TOV_length];
     cs_prime[1] = 0.0
     λ = @. -log(1 - 2 * m / r);
     λ[1] = 0.0;
@@ -1122,12 +1122,13 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
     cs_prime_prime = zero(cs_prime)
     FiniteDiffOrder4.compute_first_derivative(cs_prime_prime, cs_prime, diff(r)[1], length(r));
 
-    w1_0 = zero(u1_0);
-    w2_0 = zero(u2_0);
-    w3_0 = zero(u3_0);
-    FiniteDiffOrder4.compute_first_derivative(w1_0, u1_0, diff(r)[1], length(r));
-    FiniteDiffOrder4.compute_first_derivative(w2_0, u2_0, diff(r)[1], length(r));
-    FiniteDiffOrder4.compute_first_derivative(w3_0, u3_0, diff(r)[1], length(r));
+    ################ INITIAL DATA ################
+    u1_0 = @. star.δu_ID(r);
+    u2_0 = @. star.δε_ID(r);
+    w1_0 = @. star.δu_dr_ID(r);
+    w2_0 = @. star.δε_dr_ID(r);
+    v1_0 = @. star.δu_dt_ID(r);
+    v2_0 = @. star.δε_dt_ID(r);
 
     # downsample
     ds_fact = argmin(@. abs(r - h)) - 1;
@@ -1143,10 +1144,10 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
     cs_prime_prime = cs_prime_prime[1:ds_fact:end];
     u1_0 = u1_0[1:ds_fact:end];
     u2_0 = u2_0[1:ds_fact:end];
-    u3_0 = u3_0[1:ds_fact:end];
     w1_0 = w1_0[1:ds_fact:end];
     w2_0 = w2_0[1:ds_fact:end];
-    w3_0 = w3_0[1:ds_fact:end];
+    v1_0 = v1_0[1:ds_fact:end];
+    v2_0 = v2_0[1:ds_fact:end];
     TOV_length = length(m);
 
     # arrays for characteristic speed computation
@@ -1193,8 +1194,6 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
 
     ################ SET UP INITIAL DATA ################
     nPointsSpace = TOV_length;
-    v1_0 = zero(r); # ∂(δu)/∂t — # assume stationary initial data
-    v2_0 = zero(r); # ∂(δε)/∂t — # assume stationary initial data
 
     if isfile(fname)
         print_progress ? println("File $fname already exists and will be overwritten.") : nothing

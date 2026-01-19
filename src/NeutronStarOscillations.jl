@@ -43,10 +43,13 @@ mutable struct Star
     N_eigvals::Int64 # number of eigenvalue-eigenvector pairs to compute
     # time domain initial data
     ξ_ID::Function # initial data function for Lagrangian displacement (ξ) (used by perfect fluid / Eckart)
-    δu_ID::Function # initial data function for perturbation of radial component of four-velocity (δu) (used by full BDNK)
-    dδu_dr_ID::Function # initial data function for radial derivative of δu (used by full BDNK)
-    # δε_ID::Function # initial data function for perturbation of energy density (used by Cowling BDNK)
-    # dδε_dr_ID::Function # initial data function for radial derivative of δε (used by Cowling BDNK)
+    ξ_dt_ID::Function # initial data function for time derivative of Lagrangian displacement (∂ξ/∂t) (used by perfect fluid / Eckart)
+    δu_ID::Function # initial data function for perturbation of radial component of four-velocity (δu) (used by BDNK)
+    δu_dr_ID::Function # initial data function for radial derivative of δu (used by BDNK)
+    δu_dt_ID::Function # initial data function for time derivative of δu (used by BDNK)
+    δε_ID::Function # initial data function for perturbation of energy density (used by BDNK)
+    δε_dr_ID::Function # initial data function for radial derivative of δε (used by BDNK)
+    δε_dt_ID::Function # initial data function for time derivative of δε (used by BDNK)
     # time domain numerical parameters
     KO::Float64 # Kreiss-Oliger dissipation factor
     CFL::Float64 # Courant-Friedrichs-Lewy factor
@@ -56,7 +59,7 @@ mutable struct Star
     T::Float64 # total integration time [ms]
     mode::Int64 # mode to evolve in time domain (-1 if not using frequency domain eigenvector as initial data)
     # checks to make sure that the parameters are valid
-    Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T, mode) = begin
+    Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, ξ_dt_ID, δu_ID, δu_dr_ID, δu_dt_ID, δε_ID, δε_dr_ID, δε_dt_ID, KO, CFL, dt_save, h_save, save_every, T, mode) = begin
     if εc_cgs <= 0.0 || εc_SI <= 0.0
         error("Central energy density must be > 0.")
     elseif pc_SI <= 0.0
@@ -115,7 +118,7 @@ mutable struct Star
     elseif mode < -1
         error("Mode to evolve in time domain 'mode' must be >= -1.")
     else
-        new(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T, mode)
+        new(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, ξ_dt_ID, δu_ID, δu_dr_ID, δu_dt_ID, δε_ID, δε_dr_ID, δε_dt_ID, KO, CFL, dt_save, h_save, save_every, T, mode)
     end
     end
 end
@@ -144,10 +147,13 @@ function Star(
     NL_maxiter::Int64,
     N_eigvals::Int64,
     ξ_ID::Function,
+    ξ_dt_ID::Function,
     δu_ID::Function,
-    dδu_dr_ID::Function,
-    # δε_ID::Function,
-    # dδε_dr_ID::Function,
+    δu_dr_ID::Function,
+    δu_dt_ID::Function,
+    δε_ID::Function,
+    δε_dr_ID::Function,
+    δε_dt_ID::Function,
     KO::Float64,
     CFL::Float64,
     dt_save::Float64,
@@ -172,7 +178,7 @@ function Star(
         ptol_TD = abs(ptol_TD) * pc_SI
     end
 
-    return Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T, mode)
+    return Star(εc_cgs, εc_SI, pc_SI, kappa, n, EOS_ε, EOS_p, dp_dε, d2p_dε2, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, ξ_dt_ID, δu_ID, δu_dr_ID, δu_dt_ID, δε_ID, δε_dr_ID, δε_dt_ID, KO, CFL, dt_save, h_save, save_every, T, mode)
 end
 
 # convenience constructor that uses Gaussian initial data for time domain simulations
@@ -213,12 +219,17 @@ function Star(
     gaussian_prime(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = (2*A*(-r + r0))/(exp((r - r0)^2/w^2)*w^2)
 
     ξ_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
-    δu_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
-    dδu_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
-    # δε_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
-    # dδε_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width);
+    ξ_dt_ID(r::Float64)::Float64 = 0.0
 
-    return Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode)
+    δu_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
+    δu_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
+    δu_dt_ID(r::Float64)::Float64 = 0.0
+
+    δε_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
+    δε_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width)
+    δε_dt_ID(r::Float64)::Float64 = 0.0;
+
+    return Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, ξ_dt_ID, δu_ID, δu_dr_ID, δu_dt_ID, δε_ID, δε_dr_ID, δε_dt_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode)
 end
 
 
@@ -409,7 +420,7 @@ function plot_initial_data_convergence(star::NeutronStarOscillations.Star, h::Fl
     end
 
     if cowling
-        NeutronStarOscillations.CowlingTimeDomain.plot_initial_data_convergence(star, h);
+        error("No initial data solver for Cowling BDNK stars.")
     else
         NeutronStarOscillations.TimeDomain.plot_initial_data_convergence(star, h);
     end 
@@ -790,12 +801,18 @@ function Star(
 
     # define interim values to create a star object
     ξ_ID(r::Float64)::Float64 = 0.0
+    ξ_dt_ID(r::Float64)::Float64 = 0.0
     δu_ID(r::Float64)::Float64 = 0.0
-    dδu_dr_ID(r::Float64)::Float64 = 0.0
-    star = Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode)
+    δu_dr_ID(r::Float64)::Float64 = 0.0
+    δu_dt_ID(r::Float64)::Float64 = 0.0
+    δε_ID(r::Float64)::Float64 = 0.0
+    δε_dr_ID(r::Float64)::Float64 = 0.0
+    δε_dt_ID(r::Float64)::Float64 = 0.0;
+
+    star = Star(εc_cgs, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, ξ_dt_ID, δu_ID, δu_dr_ID, δu_dt_ID, δε_ID, δε_dr_ID, δε_dt_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode)
 
     # create a new star with relaxation times set to zero (since we only have frequency domain methods for PF and Eckart stars)
-    star_FD = Star(εc_cgs, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, δu_ID, dδu_dr_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode);
+    star_FD = Star(εc_cgs, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, ξ_ID, ξ_dt_ID, δu_ID, δu_dr_ID, δu_dt_ID, δε_ID, δε_dr_ID, δε_dt_ID, KO, CFL, dt_save, h_save, save_every, T; mode = mode);
     star_FD.τε = 0.0
     star_FD.τP = 0.0
     star_FD.τQ = 0.0
@@ -848,7 +865,7 @@ function Star(
 
     star.ξ_ID = ξ_func
     star.δu_ID = δu_func
-    star.dδu_dr_ID = dδu_dr_func
+    star.δu_dr_ID = dδu_dr_func
     return star
 end
 
@@ -938,8 +955,16 @@ end
         gaussian_prime(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = (2*A*(-r + r0))/(exp((r - r0)^2/w^2)*w^2)
 
         xi_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for Lagrangian displacement (ξ) (used by perfect fluid / Eckart) — (Function)
-        du_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for perturbation of radial component of four-velocity (δu) (used by full BDNK) — (Function)
-        ddu_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for radial derivative of δu (used by full BDNK) — (Function)
+        xi_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of ξ (used by perfect fluid / Eckart) — (Function)
+
+        du_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for perturbation of radial component of four-velocity (δu) (used by BDNK) — (Function)
+        du_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for radial derivative of δu (used by BDNK) — (Function)
+        du_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of δu (used by BDNK) — (Function)
+
+        de_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for perturbation of energy density (δε) (used by BDNK) — (Function)
+        de_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for radial derivative of δε (used by BDNK) — (Function)
+        de_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of δε (used by BDNK) — (Function)
+
 
         # time domain numerical parameters
         KO = 0.1; # Kreiss-Oliger dissipation coefficient for BDNK evolution — (Float64)
@@ -958,14 +983,13 @@ end
 
         #################### CREATING STAR OBJECTS ####################
         # set all viscous parameters to zero for perfect fluid star as well as KO since only used in time integration of BDNK equations
-        PF_star = NeutronStarOscillations.Star(eps_central, kappa, n, 0.0, 0.0, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+        PF_star = NeutronStarOscillations.Star(eps_central, kappa, n, 0.0, 0.0, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, xi_dt_ID, du_ID, du_dr_ID, du_dt_ID, de_ID, de_dr_ID, de_dt_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 
         # set relaxation times to zero for Eckart star as well as KO since only used in time integration of BDNK equations
-        Eckart_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+        Eckart_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, xi_dt_ID, du_ID, du_dr_ID, du_dt_ID, de_ID, de_dr_ID, de_dt_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 
         # BDNK star
-        BDNK_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
-
+        BDNK_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, xi_dt_ID, du_ID, du_dr_ID, du_dt_ID, de_ID, de_dr_ID, de_dt_ID, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 
         # adjust star parameters to make runs faster
         h_save = 1e-1;

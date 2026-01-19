@@ -353,9 +353,9 @@ function plot_initial_data_convergence(star::NeutronStarOscillations.Star, h::Fl
     sol = load_solution(star, h);
     
 
-    x = [sol["solution/r"][:], sol["solution/r"][:]];
-    y = [sol["solution/Q_u2"][:], sol["solution/Q_u3"][:]];
-    labels = [L"\delta{\epsilon}", L"\delta\lambda"]
+    x = [sol["solution/r"][:]];
+    y = [sol["solution/Q_u3"][:]];
+    labels = [L"\delta\lambda"]
     ylabel = L"Q_{N}";
     xlabel = L"r\,[\mathrm{km}]";
 
@@ -562,7 +562,6 @@ function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoi
     return coef * (u_plus_2 - 4.0 * u_plus_1 + 6.0 * u - 4.0 * u_minus_1 + u_minus_2) / 16.0
 end
 
-# note that we assume stationary initial data both here and in all time domain functions
 function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::Bool = true)
     fname = TimeDomain.td_fname(star, h)
     if abs(star.ξ_ID(0.0)) > 1e-16
@@ -623,7 +622,7 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
     ################ SET UP INITIAL DATA ################
     nPointsSpace = TOV_length;
     u1_0 = @. star.ξ_ID(r) # ξ
-    v1_0 = zero(r); # ∂ξ/∂t — # assume stationary initial data
+    v1_0 = @. star.ξ_dt_ID(r); # ∂ξ/∂t
 
     if isfile(fname)
         print_progress ? println("File $fname already exists and will be overwritten.") : nothing
@@ -759,7 +758,7 @@ p_prime(m::Float64, p::Float64, ε::Float64, r::Float64)::Float64 = -0.5*((-1 + 
 cs_prime_func(m::Float64, p::Float64, ε::Float64, cs::Float64, r::Float64, d2p_dε2::Function)::Float64 = d2p_dε2(ε) * p_prime(m, p, ε, r) / (2 * cs^3)
 cs_prime_func(m::Float64, p::Float64, ε::Float64, cs::Float64, r::Float64, d2p_dε2::Float64)::Float64 = d2p_dε2 * p_prime(m, p, ε, r) / (2 * cs^3)
 
-function initialize_solution_file(filename::String, m::AbstractVector{Float64}, p::AbstractVector{Float64}, ε::AbstractVector{Float64}, ν::AbstractVector{Float64}, r::AbstractVector{Float64}, cs::AbstractVector{Float64}, cs_prime::AbstractVector{Float64}, Λ0::AbstractVector{Float64}, Λ1::AbstractVector{Float64}, Λ2::AbstractVector{Float64}, u1::AbstractVector{Float64}, u2::AbstractVector{Float64}, u3::AbstractVector{Float64}, v1::AbstractVector{Float64}, v2::AbstractVector{Float64}, v3::AbstractVector{Float64}, Q_u2::AbstractVector{Float64}, Q_u3::AbstractVector{Float64},  ds::Int64, N::Int, num_time_steps::Int, chunk_size::Int)
+function initialize_solution_file(filename::String, m::AbstractVector{Float64}, p::AbstractVector{Float64}, ε::AbstractVector{Float64}, ν::AbstractVector{Float64}, r::AbstractVector{Float64}, cs::AbstractVector{Float64}, cs_prime::AbstractVector{Float64}, Λ0::AbstractVector{Float64}, Λ1::AbstractVector{Float64}, Λ2::AbstractVector{Float64}, u1::AbstractVector{Float64}, u2::AbstractVector{Float64}, u3::AbstractVector{Float64}, v1::AbstractVector{Float64}, v2::AbstractVector{Float64}, v3::AbstractVector{Float64}, Q_u3::AbstractVector{Float64},  ds::Int64, N::Int, num_time_steps::Int, chunk_size::Int)
     fmode = "w"
     file = h5open(filename, fmode); # filename should include the path
 
@@ -782,7 +781,6 @@ function initialize_solution_file(filename::String, m::AbstractVector{Float64}, 
     file["solution"]["ν"] = ν[1:ds:end];
     file["solution"]["cs"] = cs[1:ds:end];
     file["solution"]["cs_prime"] = cs_prime[1:ds:end];
-    file["solution"]["Q_u2"] = Q_u2[1:ds:end];
     file["solution"]["Q_u3"] = Q_u3[1:ds:end];
     file["solution"]["Λ0"] = Λ0[1:ds:end];
     file["solution"]["Λ1"] = Λ1[1:ds:end];
@@ -944,7 +942,6 @@ function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoi
     return coef * (u_plus_2 - 4.0 * u_plus_1 + 6.0 * u - 4.0 * u_minus_1 + u_minus_2) / 16.0
 end
 
-# note that we assume stationary initial data both here and in all time domain functions
 function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Float64 = 0.0, print_progress::Bool = true)
     fname = TimeDomain.td_fname(star, h)
     # ensure boundary condition that u1(r=0) = 0 is enforced
@@ -969,32 +966,25 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
     ################ SOLVE FOR INITIAL DATA AND TOV BACKGROUND ################
     # run at high resolutions
     h_ID = 5e-4
-    r_1, u2_lev1, u3_lev1 = BDNKInitialData.compute_initial_data(star, 4.0h_ID; u2_0=δε_center);
-    r_2, u2_lev2, u3_lev2 = BDNKInitialData.compute_initial_data(star, 2.0h_ID; u2_0=δε_center);
-    r_3, u2_lev3, u3_lev3 = BDNKInitialData.compute_initial_data(star, 1.0h_ID; u2_0=δε_center);
+    r_1, u3_lev1 = BDNKInitialData.compute_initial_data(star, 4.0h_ID);
+    r_2, u3_lev2 = BDNKInitialData.compute_initial_data(star, 2.0h_ID);
+    r_3, u3_lev3 = BDNKInitialData.compute_initial_data(star, 1.0h_ID);
 
     # interpolate to compute convergence factor
     spline_order = 5; s = 0.0;
-    δε_spline_1 = Spline1D(r_1, u2_lev1; k=spline_order, s=s);
-    δε_spline_2 = Spline1D(r_2, u2_lev2; k=spline_order, s=s);
-    δε_spline_3 = Spline1D(r_3, u2_lev3; k=spline_order, s=s);
-
     δλ_spline_1 = Spline1D(r_1, u3_lev1; k=spline_order, s=s);
     δλ_spline_2 = Spline1D(r_2, u3_lev2; k=spline_order, s=s);
     δλ_spline_3 = Spline1D(r_3, u3_lev3; k=spline_order, s=s);
 
     # compute high resolution TOV and desample to user input
     h_TOV = 1e-4;
-    r, u2_0, u3_0, u1_0, w1_0, m, p, ε, ν, cs, cs_prime = BDNKInitialData.compute_initial_data(star, h_TOV / 2.0; u2_0=δε_center, return_all=true);
+    r, u1_0, u2_0, u3_0, w1_0, w2_0, v1_0, v2_0, m, p, ε, ν, cs, cs_prime = BDNKInitialData.compute_initial_data(star, h_TOV / 2.0; return_all=true);
+
     cs_prime[1] = 0.0
     cs_prime_prime = zero(cs_prime)
     FiniteDiffOrder4.compute_first_derivative(cs_prime_prime, cs_prime, diff(r)[1], length(r));
-
-    w1_0 = zero(u1_0);
-    w2_0 = zero(u2_0);
+    
     w3_0 = zero(u3_0);
-    FiniteDiffOrder4.compute_first_derivative(w1_0, u1_0, diff(r)[1], length(r));
-    FiniteDiffOrder4.compute_first_derivative(w2_0, u2_0, diff(r)[1], length(r));
     FiniteDiffOrder4.compute_first_derivative(w3_0, u3_0, diff(r)[1], length(r));
 
     # downsample
@@ -1014,6 +1004,8 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
     w1_0 = w1_0[1:ds_fact:end];
     w2_0 = w2_0[1:ds_fact:end];
     w3_0 = w3_0[1:ds_fact:end];
+    v1_0 = v1_0[1:ds_fact:end];
+    v2_0 = v2_0[1:ds_fact:end];
     TOV_length = length(m);
 
     # intial data convergence factor
@@ -1021,12 +1013,7 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
     δλ_2_ds = @. δλ_spline_2(r);
     δλ_3_ds = @. δλ_spline_3(r);
 
-    δε_1_ds = @. δε_spline_1(r);
-    δε_2_ds = @. δε_spline_2(r);
-    δε_3_ds = @. δε_spline_3(r);
-
     Q_δλ = [abs(δλ_2_ds[i] - δλ_1_ds[i]) / abs(δλ_3_ds[i] - δλ_2_ds[i]) for i in eachindex(δλ_1_ds)];
-    Q_δε = [abs(δε_2_ds[i] - δε_1_ds[i]) / abs(δε_3_ds[i] - δε_2_ds[i]) for i in eachindex(δε_1_ds)];
 
     # compute background PDE coefficients 
     CNSystem = BDNKDiffEqCoefficients.CNSystem(m, p, ε, ν, cs, cs_prime, cs_prime_prime, r, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L, h, TOV_length);
@@ -1042,10 +1029,6 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
         Λ1[i] = ΛΛ1
         Λ2[i] = ΛΛ2
     end
-
-    # we always assume stationary initial data
-    v1_0 = zero(u1_0)
-    v2_0 = zero(u1_0)
 
     ################ SET UP ARRAYS FOR TIME EVOLUTION ################
     # we have 5 TOV variables, 5 perturbation variables (velocity, energy and metric perturbations and the time derivatives of the former 2) and 5 independent residuals (IRs——2 from the wave-equations we solve and 3 from the original wave-like equations that come out directly from the Einstein-BDNK system). To compute the IR, we must retain three time levels of the perturbations. We separately store these 3 time levels from another (desampled) solution array that will be saved to file
@@ -1093,7 +1076,7 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; δε_center::Floa
     num_saved_steps = length(save_time_idx);
     v3_0 = zero(u3_0);
     BDNKLinearSystem.compute_v3!(u1_0, u2_0, u3_0, w1_0, w2_0, w3_0, v1_0, v2_0, v3_0, m, p, ε, ν, cs, r, star.η, star.ζ, star.τε, star.τP, star.τQ, star.L)
-    file = initialize_solution_file(fname, m, p, ε, ν, r, cs, cs_prime, Λ0, Λ1, Λ2, u1_0, u2_0, u3_0, v1_0, v2_0, v3_0, Q_δε, Q_δλ, ds_fact, nPointsSpace_save, num_saved_steps, star.save_every)
+    file = initialize_solution_file(fname, m, p, ε, ν, r, cs, cs_prime, Λ0, Λ1, Λ2, u1_0, u2_0, u3_0, v1_0, v2_0, v3_0, Q_δλ, ds_fact, nPointsSpace_save, num_saved_steps, star.save_every)
 
     ################ SET UP STEP ARRAYS FOR CURRENT AND ADVANCED TIME STEP ################
     u1_n = zeros(nPointsSpace);

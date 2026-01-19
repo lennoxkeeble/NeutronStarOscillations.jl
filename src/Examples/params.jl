@@ -43,10 +43,7 @@ NL_maxiter = 200; # maximum number of NonlinearSolve iterations — (Int64)
 N_eigvals = 5; # number of eigenvalue-eigenvector pairs to compute — (Int64)
 
 #= 
-    time domain initial data functions. In the Eckart case, u1 is the Lagrangian displacement. In the BDNK case, u1 is the radial velocty perturbation.
-    In both cases we assume stationary initial data (i.e., time derivatives of perturbations are zero at t=0). The example scripts show different options for
-    specifying initial data. Below is the most basic version where one directly specifies δu and its radial derivative. We provide in built functions for
-    the Gaussian (so one just specifies the amplitude, center, and width) as well as an option for using the perfect fluid eigenvectors as initial data.
+    Time domain initial data functions. The example scripts show different options for specifying initial data. For the perfeclt fluid / Eckart equations, the lagrangian displacement ξ and its time derivative must be specified at the initial time. For the BDNK fluid, one must specidy the radial velocity perturbation δu, the energy density perturbation δε, and their radial and time derivatives. Inside the BDNK time domain solver, this initial data is used to solve an ODE for the initial data in the metric perturbation δλ. We additionally provide in built functions for a Gaussian in δu and δε (so one just specifies the amplitude, center, and width) as well as an option for using the perfect fluid / Eckart eigenvectors as initial data for ξ and/or δu.
 =#
 
 Gaussian_amplitude = 1.0; # amplitude of Gaussian initial data — (Float64)
@@ -56,8 +53,15 @@ gaussian(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = A/exp((r - 
 gaussian_prime(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = (2*A*(-r + r0))/(exp((r - r0)^2/w^2)*w^2)
 
 xi_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for Lagrangian displacement (ξ) (used by perfect fluid / Eckart) — (Function)
-du_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for perturbation of radial component of four-velocity (δu) (used by full BDNK) — (Function)
-ddu_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for radial derivative of δu (used by full BDNK) — (Function)
+xi_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of ξ (used by perfect fluid / Eckart) — (Function)
+
+du_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for perturbation of radial component of four-velocity (δu) (used by BDNK) — (Function)
+du_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for radial derivative of δu (used by BDNK) — (Function)
+du_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of δu (used by BDNK) — (Function)
+
+de_ID(r::Float64)::Float64 = gaussian(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for perturbation of energy density (δε) (used by BDNK) — (Function)
+de_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_center, Gaussian_width) # initial data function for radial derivative of δε (used by BDNK) — (Function)
+de_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of δε (used by BDNK) — (Function)
 
 # time domain numerical parameters
 KO = 0.1; # Kreiss-Oliger dissipation coefficient for BDNK evolution — (Float64)
@@ -75,13 +79,13 @@ mkpath(fig_path)
 
 #################### CREATING STAR OBJECTS ####################
 # set all viscous parameters to zero for perfect fluid star as well as KO since only used in time integration of BDNK equations
-PF_star = NeutronStarOscillations.Star(eps_central, kappa, n, 0.0, 0.0, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+PF_star = NeutronStarOscillations.Star(eps_central, kappa, n, 0.0, 0.0, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, xi_dt_ID, du_ID, du_dr_ID, du_dt_ID, de_ID, de_dr_ID, de_dt_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 
 # set relaxation times to zero for Eckart star as well as KO since only used in time integration of BDNK equations
-Eckart_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+Eckart_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, 0.0, 0.0, 0.0, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, xi_dt_ID, du_ID, du_dr_ID, du_dt_ID, de_ID, de_dr_ID, de_dt_ID, 0.0, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 
 # BDNK star
-BDNK_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, du_ID, ddu_dr_ID, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
+BDNK_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, xi_ID, xi_dt_ID, du_ID, du_dr_ID, du_dt_ID, de_ID, de_dr_ID, de_dt_ID, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 
 #################### DEFAULT INITIAL DATA OPTIONS ####################
 #=
