@@ -9,7 +9,7 @@ export Star, get_star_type, solve_TOV, load_TOV, plot_TOV_var, compute_eigensyst
 
 mutable struct Star
     ########## STELLAR PARAMETERS ##########
-    εc_cgs::Float64 # central energy density [g/cm^3]
+    εc_cgs # central energy density [g/cm^3]
     εc_SI::Float64 # central energy density [km^(-2)]
     pc_SI::Float64 # central pressure [km^(-2)]
     # polytropic params for equation of state p = κ * ε^(1 + 1 / n)
@@ -125,7 +125,7 @@ end
 
 # convenience constructor that specifies polytrope EoS functions
 function Star(
-    εc_cgs::Float64,
+    εc_cgs,
     kappa::Float64,
     n::Float64,
     η::Float64,
@@ -183,7 +183,7 @@ end
 
 # convenience constructor that uses Gaussian initial data for time domain simulations
 function Star(
-    εc_cgs::Float64,
+    εc_cgs,
     kappa::Float64,
     n::Float64,
     η::Float64,
@@ -766,7 +766,7 @@ end
 
 # convenience constructor that uses frequency domain eigenvector corresponding to the nth overtone as initial data for time domain simulations. Warning: this function computes eigenvectors using the frequency domain code and then interpolates them to create initial data functions. If the time domain grid extends slightly beyond the frequency domain grid, an error will be thrown since the interpolation functions are not defined outside the frequency domain grid. To avoid this, make sure the frequency domain code is ran at a higher resolution than the time domain code with the same (or smaller) pressure tolerance.
 function Star(
-    εc_cgs::Float64,
+    εc_cgs,
     kappa::Float64,
     n::Float64,
     η::Float64,

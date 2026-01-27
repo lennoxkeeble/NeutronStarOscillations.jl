@@ -52,7 +52,7 @@ du3_dr(u1::Float64, u2::Float64, u3::Float64, du1_dr::Float64, du2_dr::Float64, 
 
 function compute_initial_data(star::NeutronStarOscillations.Star, h::Float64; return_all = false)
     # compute TOV at high resolution
-    h_TOV = 1e-5;
+    h_TOV = 1e-4;
     r, m, p, ε, ν = NeutronStarOscillations.TOV.Explicit.solve(star, h_TOV / 2.0; TD=true, save_to_file=false);
 
     TOV_length = length(m);

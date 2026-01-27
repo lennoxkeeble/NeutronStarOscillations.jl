@@ -80,7 +80,7 @@ function plot11(x, y;
         if scatter_lines
             scatterlines!(ax, x[i], y[i], color=colors[i], label=labels[i])
         else
-            lines!(ax, x[i], y[i], color=colors[i], label=labels[i], linestyle=linestyles[i])
+            lines!(ax, x[i], y[i], color=colors[i], label=labels[i], linestyle=linestyles[i], linewidth=linewidths[i], alpha=alphas[i])
         end
     end
 

@@ -12,23 +12,23 @@ using NeutronStarOscillations
 using LaTeXStrings
 
 #################### STELLAR PARAMETERS ####################
-eps_central = 3.0e15; # central energy density [g/cm^3] — (Float64)
+eps_central = 5.5e15; # central energy density [g/cm^3] — (Float64)
 
 # polytropic parameter for equation of state p = κ * ε^(1 + 1 / n)
-n = 0.8; # polytropic index — (Float64)
-kappa = 700.0; # polytropic prefactor [km^(-2 / n)] — (Float64)
+n = 1.0; # polytropic index — (Float64)
+kappa = 100.0; # polytropic prefactor [km^(-2 / n)] — (Float64)
 
 # viscous parameters
-η = 1.0e-1; # dimensionless shear viscosity parameter — (Float64) 
+η = 1.0e-2; # dimensionless shear viscosity parameter — (Float64) 
 ζ = 1.0e-1; # dimensionless bulk viscosity parameter — (Float64)
 τε = 10.0; # dimensionless relaxation time parameter — (Float64)
-τP = 1.0; # dimensionless relaxation time parameter — (Float64)
-τQ = 5.0; # dimensionless relaxation time parameter — (Float64)
+τP = 1.5; # dimensionless relaxation time parameter — (Float64)
+τQ = 10.0; # dimensionless relaxation time parameter — (Float64)
 L = 1.0; # length scale associated with viscous parameters [km] — (Float64)
 
 #################### NUMERICAL PARAMETERS ####################
 ptol = -1e-6; # pressure at which to terminate integration in TOV and frequency domain code [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol * p(r=0) — (Float64)
-ptol_TD = -1e-3; # pressure at which to terminate integration for time domain solver [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol_TD * p(r=0) — (Float64)
+ptol_TD = -1e-4; # pressure at which to terminate integration for time domain solver [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol_TD * p(r=0) — (Float64)
 
 # TOV-solver specific numerical parameters for implicit solver
 TOV_iter_tol = 1e-15; # tolerance for Newton iteration in implicit solver — (Float64)
@@ -47,7 +47,7 @@ N_eigvals = 5; # number of eigenvalue-eigenvector pairs to compute — (Int64)
 =#
 
 Gaussian_amplitude = 1.0; # amplitude of Gaussian initial data — (Float64)
-Gaussian_center = 5.0; # center of Gaussian initial data [km] — (Float64)
+Gaussian_center = 4.0; # center of Gaussian initial data [km] — (Float64)
 Gaussian_width = 0.5; # width of Gaussian initial data [km] — (Float64)
 gaussian(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = A/exp((r - r0)^2/w^2)
 gaussian_prime(r::Float64, A::Float64, r0::Float64, w::Float64)::Float64 = (2*A*(-r + r0))/(exp((r - r0)^2/w^2)*w^2)

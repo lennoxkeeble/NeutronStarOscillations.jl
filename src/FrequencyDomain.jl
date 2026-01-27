@@ -10,6 +10,11 @@
 module FrequencyDomain
 using NeutronStarOscillations
 using Printf
+using NonlinearSolve
+
+NL_solver = NonlinearSolve.RobustMultiNewton()
+NL_termination_condition = NonlinearSolve.RelTerminationMode()
+# NL_termination_condition = NonlinearSolveBase.AbsTerminationMode()
 
 # Dierckx interpolation parameters
 const spline_order::Int64 = 5;
@@ -390,9 +395,7 @@ function iterate_frequencies(m::Vector{Float64}, p::Vector{Float64}, ε::Vector{
         print_progress ? println("Root finding eigenvalue $i / $N_eigvals") : nothing
         u0 = [real(ω_init[i])]
         prob = NonlinearProblem(bivariate_func, u0)
-        # sol = solve(prob, RobustMultiNewton(), termination_condition = NormTerminationMode(NonlinearSolveBase.L2_NORM),
-        # reltol = NL_reltol, abstol = NL_abstol, maxiters = NL_maxiter)
-        sol = solve(prob, RobustMultiNewton(), termination_condition = RelTerminationMode(),
+        sol = solve(prob, NeutronStarOscillations.FrequencyDomain.NL_solver, termination_condition = NeutronStarOscillations.FrequencyDomain.NL_termination_condition,
         reltol = NL_reltol, maxiters = NL_maxiter)
         ω[i] = sol.u[1]
 
@@ -950,9 +953,7 @@ function iterate_frequencies(m::Vector{Float64}, p::Vector{Float64}, ε::Vector{
         print_progress ? println("Root finding eigenvalue $i / $N_eigvals") : nothing
         u0 = [real(ω_init[i])]
         prob = NonlinearProblem(bivariate_func, u0)
-        # sol = solve(prob, RobustMultiNewton(), termination_condition = NormTerminationMode(NonlinearSolveBase.L2_NORM),
-        # reltol = NL_reltol, abstol = NL_abstol, maxiters = NL_maxiter)
-        sol = solve(prob, RobustMultiNewton(), termination_condition = RelTerminationMode(),
+        sol = solve(prob, NeutronStarOscillations.FrequencyDomain.NL_solver, termination_condition = NeutronStarOscillations.FrequencyDomain.NL_termination_condition,
         reltol = NL_reltol, maxiters = NL_maxiter)
         ω[i] = sol.u[1]
 
@@ -1609,9 +1610,7 @@ function iterate_frequencies(m::Vector{Float64}, p::Vector{Float64}, ε::Vector{
         print_progress ? println("Root finding eigenvalue $i / $N_eigvals") : nothing
         u0 = [real(ω_init[i]), imag(ω_init[i])]
         prob = NonlinearProblem(bivariate_func, u0)
-        # sol = solve(prob, RobustMultiNewton(), termination_condition = NormTerminationMode(NonlinearSolveBase.L2_NORM),
-        # reltol = NL_reltol, abstol = NL_abstol, maxiters = NL_maxiter)
-        sol = solve(prob, RobustMultiNewton(), termination_condition = RelTerminationMode(),
+        sol = solve(prob, NeutronStarOscillations.FrequencyDomain.NL_solver, termination_condition = NeutronStarOscillations.FrequencyDomain.NL_termination_condition,
         reltol = NL_reltol, maxiters = NL_maxiter)
         ω[i] = sol.u[1] + im * sol.u[2]
 

@@ -40,7 +40,7 @@ round_down(x::Float64, digits::Int) = floor(x * 10.0^digits) / 10.0^digits
 # label_time(time::Float64)::AbstractString = L"t = %$(round(Int, time))"
 label_time(time::Float64; sigdigits::Int64 = 3)::AbstractString = L"t = %$(round(time; sigdigits=sigdigits))\,\mathrm{ms}"
 
-function make_plain_animation(anim_name, timestamps, framerate, fig_width, fig_height, xlabel, ylabel, t, x, y, label1, text_xloc, text_yloc, xalign, yalign, colors, linestyles, alphas, linewidths, labels; labelsize = fontsize, framevisible = true, legend = true, position = :cc, normalize=false, label2 = "", fix_ylims = false, ymin = -100.0, ymax = -200.0)
+function make_plain_animation(anim_name, timestamps, framerate, fig_width, fig_height, xlabel, ylabel, t, x, y, label1, text_xloc, text_yloc, xalign, yalign, colors, linestyles, alphas, linewidths, labels; labelsize = fontsize, framevisible = true, legend = true, position = :cc, normalize=false, label2 = "", fix_ylims = false, lim_y_min = -100.0, lim_y_max = -200.0)
     with_theme(theme_latexfonts()) do
         f = Figure(size = (fig_width, fig_height))
         ax1 = Axis(f[1, 1], ylabel=ylabel, xlabel = xlabel,
@@ -84,7 +84,7 @@ function make_plain_animation(anim_name, timestamps, framerate, fig_width, fig_h
                 y_range = 1e-12
             end
             ylims = [ylims[1] - y_offset_factor * y_range, ylims[2] + y_offset_factor * y_range]
-            fix_ylims ? ylims!(ax1, ymin, ymax) : ylims!(ax1, ylims[1], ylims[2])
+            fix_ylims ? ylims!(ax1, lim_y_min, lim_y_max) : ylims!(ax1, ylims[1], ylims[2])
         end
     end
 

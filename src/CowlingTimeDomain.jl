@@ -305,7 +305,7 @@ function animate_var(star::NeutronStarOscillations.Star, h::Float64, var::String
 
     Animations.make_plain_animation(anim_fname, timestamps, framerate, width, height,
         xlabel, ylabel, t, x, y, text, text_xloc, text_yloc, xalign, yalign, colors,
-        linestyles, alphas, linewidths, labels; legend = legend, position = position, fix_ylims = fix_ylims, ymin = lim_y_min, ymax = lim_y_max)
+        linestyles, alphas, linewidths, labels; legend = legend, position = position, fix_ylims = fix_ylims, lim_y_min = lim_y_min, lim_y_max = lim_y_max)
 end
 
 function plot_characteristic_speeds(star::NeutronStarOscillations.Star, h::Float64)
