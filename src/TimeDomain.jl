@@ -903,43 +903,35 @@ end
 
 # Kreiss-Oliger dissipation
 function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoints::Int64, spacing::Int64)
-    if j == 1
-        u_minus_2 = var[1]
-        u_minus_1 = var[1]
-        u = var[1]
-        u_plus_1 = var[2]
-        u_plus_2 = var[3]
-        error("Kreiss-Oliger dissipation not defined at first grid point")
-    elseif j == 2
-        u_minus_2 = var[1]
-        u_minus_1 = var[1]
-        u = var[2]
-        u_plus_1 = var[3]
-        u_plus_2 = var[4]
-        error("Kreiss-Oliger dissipation not defined at second grid point")
-    elseif j == nPoints-1
-        u_minus_2 = var[nPoints-3]
-        u_minus_1 = var[nPoints-2]
-        u = var[nPoints-1]
-        u_plus_1 = var[nPoints]
-        u_plus_2 = 0.0
-        error("Kreiss-Oliger dissipation not defined at second to last grid point")
-    elseif j == nPoints
-        u_minus_2 = var[nPoints-2]
-        u_minus_1 = var[nPoints-1]
-        u = var[nPoints]
-        u_plus_1 = 0.0
-        u_plus_2 = 0.0
-        error("Kreiss-Oliger dissipation not defined at last grid point")
+    if j == 1 || j == nPoints
+        error("Kreiss-Oliger dissipation not defined at first or last grid point")
+    elseif j == 2 || j == nPoints-1
+        error("Kreiss-Oliger dissipation not defined at second or second to last grid point")
+    elseif j == 3 || j == nPoints-2
+        kreiss_oliger_2(var, j, coef, nPoints, spacing)
     else
-        u_minus_2 = var[j-2*spacing]
-        u_minus_1 = var[j-1*spacing]
-        u = var[j]
-        u_plus_1 = var[j+1*spacing]
-        u_plus_2 = var[j+2*spacing]
+        kreiss_oliger_4(var, j, coef, nPoints, spacing)
     end
+end
 
+function kreiss_oliger_2(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoints::Int64, spacing::Int64)
+    u_minus_2 = var[j-2*spacing]
+    u_minus_1 = var[j-1*spacing]
+    u = var[j]
+    u_plus_1 = var[j+1*spacing]
+    u_plus_2 = var[j+2*spacing]
     return coef * (u_plus_2 - 4.0 * u_plus_1 + 6.0 * u - 4.0 * u_minus_1 + u_minus_2) / 16.0
+end
+
+function kreiss_oliger_4(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoints::Int64, spacing::Int64)
+    u_minus_3 = var[j-3*spacing]
+    u_minus_2 = var[j-2*spacing]
+    u_minus_1 = var[j-1*spacing]
+    u = var[j]
+    u_plus_1 = var[j+1*spacing]
+    u_plus_2 = var[j+2*spacing]
+    u_plus_3 = var[j+3*spacing]
+    return coef * ( - u_plus_3 + 6 * u_plus_2 - 15 * u_plus_1 + 20 * u - 15 * u_minus_1 + 6 * u_minus_2 - u_minus_3 ) / 64.0
 end
 
 function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::Bool = true)
