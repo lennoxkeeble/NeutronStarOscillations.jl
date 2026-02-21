@@ -19,11 +19,14 @@ n = 1.0; # polytropic index — (Float64)
 kappa = 100.0; # polytropic prefactor [km^(-2 / n)] — (Float64)
 
 # viscous parameters
-η = 1.0e-6; # dimensionless shear viscosity parameter — (Float64) 
-ζ = 1.0e-5; # dimensionless bulk viscosity parameter — (Float64)
-τε = 10.0; # dimensionless relaxation time parameter — (Float64)
-τP = 1.5; # dimensionless relaxation time parameter — (Float64)
-τQ = 10.0; # dimensionless relaxation time parameter — (Float64)
+η = 1.0e-2; # dimensionless shear viscosity parameter — (Float64) 
+ζ = 1.0e-1; # dimensionless bulk viscosity parameter — (Float64)
+# τε = 10.0; # dimensionless relaxation time parameter — (Float64)
+# τP = 1.5; # dimensionless relaxation time parameter — (Float64)
+# τQ = 10.0; # dimensionless relaxation time parameter — (Float64)
+τε = 20.0;
+τP = 4.0;
+τQ = 30.0;
 L = 1.0; # length scale associated with viscous parameters [km] — (Float64)
 
 #################### NUMERICAL PARAMETERS ####################
@@ -64,7 +67,7 @@ de_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_c
 de_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of δε (used by BDNK) — (Function)
 
 # time domain numerical parameters
-KO = 0.11; # Kreiss-Oliger dissipation coefficient for BDNK evolution — (Float64)
+KO = 0.1; # Kreiss-Oliger dissipation coefficient for BDNK evolution — (Float64)
 CFL = 0.1; # Courant-Friedrichs-Lewy factor — (Float64)
 h_save = 4e-2; # spatial grid spacing for saved data points [km] — (Float64)
 total_time_ms = 0.05; # total integration time [ms] — (Float64)

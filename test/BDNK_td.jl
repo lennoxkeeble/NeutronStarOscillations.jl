@@ -1,7 +1,7 @@
 include("params.jl")
 res = 4e-2;
 mode = 0;
-KO = 0.1;
+KO = 0.2;
 CFL = 0.1; # Courant-Friedrichs-Lewy factor — (Float64)
 total_time_ms = 10.0; # total integration time [ms] — (Float64)
 dt_save_ms = total_time_ms / 1000.0; # time interval between saved data points [ms] — (Float64)
@@ -11,17 +11,8 @@ cowling = false;
 star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, mode, cowling, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 @time time_integrate(star, res, cowling; print_progress = true);
 
-# star1 = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, mode, cowling, 0.1, CFL, dt_save_ms, h_save, save_every, total_time_ms);
-# star2 = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, mode, cowling, 0.5, CFL, dt_save_ms, h_save, save_every, total_time_ms);
-
-# sol1 = load_td_solution(star1, res, cowling);
-# sol2 = load_td_solution(star2, res, cowling);
 sol = load_td_solution(star, res, cowling);
-# keys(sol1["solution"])
-
 max_idx = 1000;
-# x = [sol1["solution/t"][1:max_idx], sol2["solution/t"][1:max_idx]];
-# y = [sol1["solution/du"][1:max_idx, end], sol2["solution/du"][1:max_idx, end]];
 x = [sol["solution/t"][1:max_idx]];
 y = [sol["solution/du"][1:max_idx, end]];
 labels = ["KO=0.1", "KO=0.5"];
@@ -46,7 +37,7 @@ NeutronStarOscillations.QuickPlots.plot11(x, y;
 # plot_characteristic_speeds(star, res, cowling)
 # plot_initial_data_convergence(star, res, cowling)
 
-time = 10.0;
+time = 0.5;
 var = "du";
 xlabel = L"r\,[\mathrm{km}]";
 ylabel = L"\delta{u}";

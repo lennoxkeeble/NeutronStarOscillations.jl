@@ -902,7 +902,7 @@ end
 end
 
 # Kreiss-Oliger dissipation
-function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoints::Int64, spacing::Int64)
+function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoints::Int64, spacing::Int64, order::Int64)
     if j == 1 || j == nPoints
         error("Kreiss-Oliger dissipation not defined at first or last grid point")
     elseif j == 2 || j == nPoints-1
@@ -910,7 +910,11 @@ function kreiss_oliger(var::AbstractVector{Float64}, j::Int, coef::Float64, nPoi
     elseif j == 3 || j == nPoints-2
         kreiss_oliger_2(var, j, coef, nPoints, spacing)
     else
-        kreiss_oliger_4(var, j, coef, nPoints, spacing)
+        if order == 2
+            kreiss_oliger_2(var, j, coef, nPoints, spacing)
+        else
+            kreiss_oliger_4(var, j, coef, nPoints, spacing)
+        end
     end
 end
 
@@ -934,7 +938,7 @@ function kreiss_oliger_4(var::AbstractVector{Float64}, j::Int, coef::Float64, nP
     return coef * ( - u_plus_3 + 6 * u_plus_2 - 15 * u_plus_1 + 20 * u - 15 * u_minus_1 + 6 * u_minus_2 - u_minus_3 ) / 64.0
 end
 
-function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::Bool = true)
+function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::Bool = true, ko_order::Int64 = 2)
     fname = TimeDomain.td_fname(star, h)
     # ensure boundary condition that u1(r=0) = 0 is enforced
     if abs(star.δu_ID(0.0)) > 1e-16
@@ -1125,11 +1129,11 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
 
         KO_edge = 3 # start applying KO dissipation at this grid point to avoid boundary issues
         @inbounds for j in KO_edge:nPointsSpace-KO_edge+1 # don't apply at all points
-            u1_np1[j] += -kreiss_oliger(u1_n, j, star.KO, nPointsSpace, 1)
-            u2_np1[j] += -kreiss_oliger(u2_n, j, star.KO, nPointsSpace, 1)
-            u3_np1[j] += -kreiss_oliger(u3_n, j, star.KO, nPointsSpace, 1)
-            v1_np1[j] += -kreiss_oliger(v1_n, j, star.KO, nPointsSpace, 1)
-            v2_np1[j] += -kreiss_oliger(v2_n, j, star.KO, nPointsSpace, 1)
+            u1_np1[j] += -kreiss_oliger(u1_n, j, star.KO, nPointsSpace, 1, ko_order)
+            u2_np1[j] += -kreiss_oliger(u2_n, j, star.KO, nPointsSpace, 1, ko_order)
+            u3_np1[j] += -kreiss_oliger(u3_n, j, star.KO, nPointsSpace, 1, ko_order)
+            v1_np1[j] += -kreiss_oliger(v1_n, j, star.KO, nPointsSpace, 1, ko_order)
+            v2_np1[j] += -kreiss_oliger(v2_n, j, star.KO, nPointsSpace, 1, ko_order)
         end
 
         u1_n .= u1_np1;
