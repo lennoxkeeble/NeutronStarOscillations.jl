@@ -13,8 +13,8 @@ using Printf
 using NonlinearSolve
 
 NL_solver = NonlinearSolve.RobustMultiNewton()
-NL_termination_condition = NonlinearSolve.RelTerminationMode()
-# NL_termination_condition = NonlinearSolveBase.AbsTerminationMode()
+# NL_termination_condition = NonlinearSolve.RelTerminationMode()
+NL_termination_condition = NonlinearSolveBase.AbsTerminationMode()
 
 # Dierckx interpolation parameters
 const spline_order::Int64 = 5;

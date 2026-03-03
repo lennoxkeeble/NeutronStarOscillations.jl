@@ -12,25 +12,46 @@ using NeutronStarOscillations
 using LaTeXStrings
 
 #################### STELLAR PARAMETERS ####################
-eps_central = 5.5e15; # central energy density [g/cm^3] — (Float64)
+# eps_central = 5.5e15; # central energy density [g/cm^3] — (Float64)
+
+eps_central = 5.662972121674183 * 1e15
 
 # polytropic parameter for equation of state p = κ * ε^(1 + 1 / n)
 n = 1.0; # polytropic index — (Float64)
 kappa = 100.0; # polytropic prefactor [km^(-2 / n)] — (Float64)
 
 # viscous parameters
-η = 1.0e-2; # dimensionless shear viscosity parameter — (Float64) 
-ζ = 1.0e-1; # dimensionless bulk viscosity parameter — (Float64)
+ζ = 1e-2; # dimensionless bulk viscosity parameter — (Float64)
+η = ζ / 10.0; # dimensionless shear viscosity parameter — (Float64) 
 # τε = 10.0; # dimensionless relaxation time parameter — (Float64)
 # τP = 1.5; # dimensionless relaxation time parameter — (Float64)
 # τQ = 10.0; # dimensionless relaxation time parameter — (Float64)
-τε = 20.0;
-τP = 4.0;
-τQ = 30.0;
+# τε = 20.0;
+# τP = 4.0;
+# τQ = 30.0;
+
+τε = 15.0;
+τP = 1.5;
+τQ = 20.0;
+
+# τε = 20.0;
+# τP = 2.0;
+# τQ = 20.0;
+
+# τε = 25.0;
+# τP = 3.0;
+# τQ = 25.0;
+
+# τε = 20.0;
+# τP = 2.0;
+# τQ = 20.0;
+# τε = 30.0;
+# τP = 4.0;
+# τQ = 40.0;
 L = 1.0; # length scale associated with viscous parameters [km] — (Float64)
 
 #################### NUMERICAL PARAMETERS ####################
-ptol = -1e-6; # pressure at which to terminate integration in TOV and frequency domain code [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol * p(r=0) — (Float64)
+ptol = -1e-8; # pressure at which to terminate integration in TOV and frequency domain code [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol * p(r=0) — (Float64)
 ptol_TD = -1e-4; # pressure at which to terminate integration for time domain solver [km^(-2)]. Positive value: sets pressure tolerance directly. Negative value: sets pressure tolerance as ptol_TD * p(r=0) — (Float64)
 
 # TOV-solver specific numerical parameters for implicit solver
@@ -40,8 +61,8 @@ TOV_max_steps = Int(1e11); # maximum number of steps to take in the solver — (
 TOV_initial_r = 1e-15; # initial radius for implicit solver [km] — (Float64)
 
 # frequency domain numerical parameters
-NL_reltol = 1e-12; # NonlinearSolve relative tolerance (used for iteration of shooting method integration to satisfy boundary conditions) — (Float64)
-NL_abstol = 1e-12; # NonlinearSolve absolute tolerance (used for iteration of shooting method integration to satisfy boundary conditions) — (Float64)
+NL_reltol = 1e-14; # NonlinearSolve relative tolerance (used for iteration of shooting method integration to satisfy boundary conditions) — (Float64)
+NL_abstol = 1e-14; # NonlinearSolve absolute tolerance (used for iteration of shooting method integration to satisfy boundary conditions) — (Float64)
 NL_maxiter = 200; # maximum number of NonlinearSolve iterations — (Int64)
 N_eigvals = 5; # number of eigenvalue-eigenvector pairs to compute — (Int64)
 
