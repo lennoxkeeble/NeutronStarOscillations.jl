@@ -1,5 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/lennoxkeeble/NeutronStarOscillations/blob/main/LICENSE)
 ![GitHub last commit](https://img.shields.io/github/last-commit/lennoxkeeble/NeutronStarOscillations)
+[![DOI](https://zenodo.org/badge/1136267109.svg)](https://doi.org/10.5281/zenodo.19207181)
 [![Build Status](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 # NeutronStarOscillations
