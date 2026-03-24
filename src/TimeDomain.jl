@@ -2,8 +2,8 @@
 
     Module comprising of functions which solve the perfect fluid, Eckart and BDNK equations of motion governing linear radial perturbations of polytropic neutron stars in the
     time domain. (Note we don't provide separate perfect fluid functions; one takes η = ζ = 0 in the Eckart functions). The Eckart equations of motion are integrated in time
-    using RK4 while the BDNK system is integrated using an implicit Cranck-Nicholson discretization. Both numerical schemes are second-second order accurate since we use
-    second-order finite differences for spatial derivatives. Functions to plot the results and compute convergence factors are also included.
+    using RK4 while the BDNK system is integrated using an implicit Cranck-Nicholson discretization. Both numerical schemes are second-order accurate since we use
+    second-order finite differences for spatial derivatives.
 
 =#
 
@@ -568,7 +568,6 @@ function solve(star::NeutronStarOscillations.Star, h::Float64; print_progress::B
         error("|ξ(r=0)| > 1e-16. ξ must be zero at the center by regularity. ξ(0.0) = $(star.ξ_ID(0.0))")
     end
 
-    # length scale not explicitly in functions for Eckart fluid; the inputs η and ζ are actually η * L and ζ * L
     ηTimesL = star.η * star.L
     ζTimesL = star.ζ * star.L
 

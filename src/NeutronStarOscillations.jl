@@ -233,9 +233,6 @@ function Star(
 end
 
 
-# convenience constructor that uses the perfect fluid eigenvector corresponding to the nth overtone as initial data for time domain simulations
-
-# file name convention. Functions will, where necessary, prepend or append additional information to this base file name. For example, data will add ".h5", figures might add "_ξ.png" for a figure of the lagrangian displacement for an Eckart or PF Star, frequency domain code will add "FD_" prefix, etc.
 include("main.jl")
 
 # wrapper functions for main frequency domain and time domain functions
@@ -892,18 +889,13 @@ end
 
 # precompilation
 @setup_workload begin
-    # --- START OF SILENCER ---
-    # Define the "Lying" Null Display locally
     struct SilentDisplay <: AbstractDisplay end
     Base.displayable(d::SilentDisplay, ::MIME) = true
     Base.display(d::SilentDisplay, x) = nothing
-    
-    # Push the display and force Makie to look for it
     Base.pushdisplay(SilentDisplay())
-    # Save current inline state to restore it later
     old_inline = Makie.inline!()
     Makie.inline!(true)
-    # --- END OF SILENCER ---
+
     @compile_workload begin
 
         #################### PARAMS.JL ####################

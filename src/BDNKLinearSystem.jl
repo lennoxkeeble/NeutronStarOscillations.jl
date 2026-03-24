@@ -52,7 +52,7 @@ end
 module RHS
 using ..Center
 
-# set up right hand side of linear system. Our convention is that the first matrix_solve_nPoints entries correspond to the trivial time reduction equation for u1 at each spatial point, the next matrix_solve_nPoints entries correspond to the trivial time reduction equation for u2 at each spatial point, the next matrix_solve_nPoints entries correspond to Eq1 at each spatial point, and the last matrix_solve_nPoints entries correspond to Eq2 at each spatial point, where Eq1 and Eq2 are the nontrivial BDNK equations.
+# set up right hand side of linear system
 function compute_RHS!(linear_system_RHS::Vector{Float64}, u1_np1::Vector{Float64}, u2_np1::Vector{Float64}, u3_np1::Vector{Float64}, v1_np1::Vector{Float64}, v2_np1::Vector{Float64}, u1_n::Vector{Float64}, u2_n::Vector{Float64}, u3_n::Vector{Float64}, v1_n::Vector{Float64}, v2_n::Vector{Float64}, CNSystem, h::Float64, k::Float64, nPointsSpace::Int64)
     # awkward indexing since we solve for (u1, v1, w2, u3, w3) everywhere apart from center but solve for (w1, u2, v2) everywhere including center
     total_trivial_u1_eqs = nPointsSpace-1
@@ -116,7 +116,7 @@ end
 module Jacobian
 using ..Center
 
-# set up jacobian. The rows correspond to the equations in the same order as the RHS above, while the columns correspond to the variables in the order u1_np1[2:N], u2_np1[2:N], v1_np1[2:N], v2_np1[2:N].
+# set up jacobian.
 function compute_jacobian!(jacobian::AbstractArray{Float64}, CNSystem, h::Float64, k::Float64, nPointsSpace::Int64)
     # awkward indexing since we solve for (u1, v1, u3, w3) everywhere apart from center but solve for (w1, u2, w2, v2) everywhere including center
     total_trivial_u1_eqs = nPointsSpace-1
@@ -384,6 +384,7 @@ function compute_jacobian!(jacobian::AbstractArray{Float64}, CNSystem, h::Float6
     jacobian[total_eqs_block_5 + (j-1), total_u_vars + total_v1_vars + j - 1] = Surface.pEq3pV2_jm1(CNSystem, j, h, k); # ∂(Eq) / ∂(v2_np1[1+n, j-1])
     jacobian[total_eqs_block_5 + (j-1), total_u_vars + total_v1_vars + j] = Surface.pEq3pV2_j(CNSystem, j, h, k); # ∂(Eq) / ∂(v2_np1[1+n, j])
 end
+
 module Interior
 # interior Eq 1
 pEq1pU1_jm1(CNSystem, j::Int64, h::Float64, k::Float64)::Float64 = CNSystem.A3[j]/(2.0*h^2) - CNSystem.A2[j]/(4.0*h)

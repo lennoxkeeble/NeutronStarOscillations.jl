@@ -200,7 +200,7 @@ function get_eigensystem(m::Function, p::Function, ε::Function, ν::Function, c
     isapprox(h * ones(length(r)-1), diff(r)) || throw(ArgumentError("The radial step size in the downsampled TOV solution is not constant."))
 
     matrix_size = length(m_arr) - 1;
-    A = zeros(matrix_size, matrix_size); # create a square matrix of
+    A = zeros(matrix_size, matrix_size);
     fill_matrix!(A, m_arr, p_arr, ε_arr, ν_arr, cs_arr, cs_prime_arr, r, h);
     eigsyst = eigen(A);
     eig_vals = eigsyst.values;
@@ -277,7 +277,7 @@ function get_eigenvalues(m::Function, p::Function, ε::Function, ν::Function, c
     isapprox(h * ones(length(r)-1), diff(r)) || throw(ArgumentError("The radial step size in the downsampled TOV solution is not constant."))
 
     matrix_size = length(m_arr) - 1;
-    A = zeros(matrix_size, matrix_size); # create a square matrix of
+    A = zeros(matrix_size, matrix_size);
     fill_matrix!(A, m_arr, p_arr, ε_arr, ν_arr, cs_arr, cs_prime_arr, r, h);
     eig_vals = eigvals(A);
 
@@ -375,7 +375,7 @@ function iterate_frequencies(m::Vector{Float64}, p::Vector{Float64}, ε::Vector{
     N_eigvals = length(ω_init);
     ω = zero(ω_init)
 
-    TOV_length = length(r); # minus four comes from removing the additional four steps in the background solution that allows us to evolve the pulsation equations until the surface of the star (since RK4 requires background solution at r + h/2 and r + h)
+    TOV_length = length(r); 
     pulsation_length = floor(Int, (TOV_length - 1) / 2) + 1;
 
     evecs = zeros(ComplexF64, pulsation_length, N_eigvals)
@@ -738,7 +738,7 @@ function get_eigensystem(m::Function, p::Function, ε::Function, ν::Function, c
     isapprox(h * ones(length(r)-1), diff(r)) || throw(ArgumentError("The radial step size in the downsampled TOV solution is not constant."))
 
     matrix_size = length(m_arr) - 1;
-    A = zeros(matrix_size, matrix_size); # create a square matrix of
+    A = zeros(matrix_size, matrix_size);
     fill_matrix!(A, m_arr, p_arr, ε_arr, ν_arr, cs_arr, cs_prime_arr, r, h);
     eigsyst = eigen(A);
     eig_vals = -eigsyst.values;
@@ -814,7 +814,7 @@ function get_eigenvalues(m::Function, p::Function, ε::Function, ν::Function, c
     isapprox(h * ones(length(r)-1), diff(r)) || throw(ArgumentError("The radial step size in the downsampled TOV solution is not constant."))
 
     matrix_size = length(m_arr) - 1;
-    A = zeros(matrix_size, matrix_size); # create a square matrix of
+    A = zeros(matrix_size, matrix_size);
     fill_matrix!(A, m_arr, p_arr, ε_arr, ν_arr, cs_arr, cs_prime_arr, r, h);
     eig_vals = -eigvals(A);
 
@@ -875,7 +875,7 @@ function get_frequencies(m::Function, p::Function, ε::Function, ν::Function, r
     cs_prime_ds = zero(cs_ds);
     FiniteDiffOrder2.compute_first_derivative(cs_prime_ds, cs_ds, h_ds, TOV_ds_length);    
 
-    A = zeros(TOV_ds_length-1, TOV_ds_length-1); # create a square matrix of
+    A = zeros(TOV_ds_length-1, TOV_ds_length-1);
     fill_matrix!(A, m_ds, p_ds, ε_ds, ν_ds, cs_ds, cs_prime_ds, r_ds, h_ds);
     omega_squared = -eigvals(A) |> sort
     return omega_squared / (2π * kHz_to_km)^2
@@ -933,7 +933,7 @@ function iterate_frequencies(m::Vector{Float64}, p::Vector{Float64}, ε::Vector{
     N_eigvals = length(ω_init);
     ω = zero(ω_init)
 
-    TOV_length = length(r); # minus four comes from removing the additional four steps in the background solution that allows us to evolve the pulsation equations until the surface of the star (since RK4 requires background solution at r + h/2 and r + h)
+    TOV_length = length(r); 
     pulsation_length = floor(Int, (TOV_length - 1) / 2) + 1;
 
     evecs = zeros(ComplexF64, pulsation_length, N_eigvals)
@@ -1581,7 +1581,6 @@ function get_eigensystem(star::NeutronStarOscillations.Star, h_shoot::Float64, h
 end
 
 function iterate_frequencies(m::Vector{Float64}, p::Vector{Float64}, ε::Vector{Float64}, ν::Vector{Float64}, cs::Vector{Float64}, cs_prime::Vector{Float64}, r::Vector{Float64}, η::Float64, ζ::Float64, L::Float64, ω_init::Vector{<:Number}, NL_reltol::Float64, NL_abstol::Float64, NL_maxiter::Int64; fname::String = "", save_to_file::Bool=false, print_progress::Bool=false)
-    # forgot to include length scale in functions for Eckart fluid, so the inputs η and ζ are actually η * L and ζ * L
     ηTimesL = η * L
     ζTimesL = ζ * L
 
@@ -1589,7 +1588,7 @@ function iterate_frequencies(m::Vector{Float64}, p::Vector{Float64}, ε::Vector{
     N_eigvals = length(ω_init);
     ω = zero(ω_init)
 
-    TOV_length = length(r); # minus four comes from removing the additional four steps in the background solution that allows us to evolve the pulsation equations until the surface of the star (since RK4 requires background solution at r + h/2 and r + h)
+    TOV_length = length(r); 
     pulsation_length = floor(Int, (TOV_length - 1) / 2) + 1;
 
     evecs = zeros(ComplexF64, pulsation_length, N_eigvals)

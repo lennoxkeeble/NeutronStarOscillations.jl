@@ -1,7 +1,7 @@
 #=
 
     Module comprising of helper functions which solve the Tolman-Oppenheimer-Volkoff (TOV) equations. Two solvers are implemented: an implicit Crank-Nicholson solver
-    (second-order accurate) and an explicit RK4 solver. Functions to plot the results and compute convergence factors are also included.
+    (second-order accurate) and an explicit RK4 solver.
 
 =#
 
@@ -217,8 +217,6 @@ function solve(EOS::Function, εc::Float64, pc::Float64, h::Float64, max_steps::
     shift = 1.0;
 
     # stop conditions 
-    # non_zero_pressure = true;
-    # num_steps = true;
     step_number = 1;
 
     try

@@ -2,8 +2,8 @@
 
     Module comprising of functions which solve the perfect fluid and BDNK equations of motion governing linear radial perturbations of polytropic neutron stars in the
     time domain in the Cowling approximation. (Note we don't provide separate perfect fluid functions; one takes η = ζ = 0 in the Eckart functions). Both sets of equations are
-    integrated in time using an explicit RK4 scheme. Both numerical schemes are second-second order accurate since we use
-    second-order finite differences for spatial derivatives. Functions to plot the results and compute convergence factors are also included.
+    integrated in time using an explicit RK4 scheme. Both numerical schemes are second-order accurate since we use
+    second-order finite differences for spatial derivatives.
 
 =#
 
@@ -433,7 +433,7 @@ end
     k1::Matrix{Float64}, k2::Matrix{Float64}, k3::Matrix{Float64}, k4::Matrix{Float64},
     m::Vector{Float64}, p::Vector{Float64}, ε::Vector{Float64}, ν::Vector{Float64}, cs::Vector{Float64}, cs_prime::Vector{Float64},
     r::Vector{Float64}, h::Float64, k::Float64, nPoints::Int64)
-        ### BCs at r=0 for regularity: ξ[t,0] = u1[t, 0] = 0, ∂_{t}ξ[t,0] = v1[t, 0] = 0, so the equations are already solved at r = 0 ###
+    ### BCs at r=0 for regularity: ξ[t,0] = u1[t, 0] = 0, ∂_{t}ξ[t,0] = v1[t, 0] = 0, so the equations are already solved at r = 0 ###
 
     ## COMPUTE K1 ##
     @inbounds for i = 2:(nPoints-1)

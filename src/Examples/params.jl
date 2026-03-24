@@ -1,9 +1,6 @@
 #=
 
-    Parameter file for all example code. Default parameters correspond to a viscous BDNK star, but at the end we create objects corresponding to perfect fluid, Eckart, and
-    BDNK stars which are used throughout the example code. To make it easier to run convergence tests, we omit parameters in these objects that change with resolution (e.g.,
-    the number of grid points in the matrix method frequency domain solver or the grid spacing in the shooting method and time domain solvers). These are instead specified
-    in the example scripts.
+    Parameter file for example code. Default parameters correspond to a viscous BDNK star, but the appropriate viscous parameters can be set to zero to obtain Eckart and perfect fluid stars.
 
 =#
 
@@ -12,18 +9,18 @@ using NeutronStarOscillations
 using LaTeXStrings
 
 #################### STELLAR PARAMETERS ####################
-eps_central = 3.0e15; # central energy density [g/cm^3] — (Float64)
+eps_central = 5.5e15; # central energy density [g/cm^3] — (Float64)
 
 # polytropic parameter for equation of state p = κ * ε^(1 + 1 / n)
-n = 0.8; # polytropic index — (Float64)
-kappa = 700.0; # polytropic prefactor [km^(-2 / n)] — (Float64)
+n = 1.0; # polytropic index — (Float64)
+kappa = 100.0; # polytropic prefactor [km^(-2 / n)] — (Float64)
 
 # viscous parameters
-η = 1.0e-1; # dimensionless shear viscosity parameter — (Float64) 
-ζ = 1.0e-1; # dimensionless bulk viscosity parameter — (Float64)
-τε = 10.0; # dimensionless relaxation time parameter — (Float64)
-τP = 1.0; # dimensionless relaxation time parameter — (Float64)
-τQ = 5.0; # dimensionless relaxation time parameter — (Float64)
+η = 1.0e-2; # dimensionless shear viscosity parameter — (Float64) 
+ζ = 1.0e-2; # dimensionless bulk viscosity parameter — (Float64)
+τε = 15.0; # dimensionless relaxation time parameter — (Float64)
+τP = 1.5; # dimensionless relaxation time parameter — (Float64)
+τQ = 20.0; # dimensionless relaxation time parameter — (Float64)
 L = 1.0; # length scale associated with viscous parameters [km] — (Float64)
 
 #################### NUMERICAL PARAMETERS ####################
@@ -64,7 +61,7 @@ de_dr_ID(r::Float64)::Float64 = gaussian_prime(r, Gaussian_amplitude, Gaussian_c
 de_dt_ID(r::Float64)::Float64 = 0.0 # initial data function for time derivative of δε (used by BDNK) — (Function)
 
 # time domain numerical parameters
-KO = 0.1; # Kreiss-Oliger dissipation coefficient for BDNK evolution — (Float64)
+KO = 0.2; # Kreiss-Oliger dissipation coefficient for BDNK evolution — (Float64)
 CFL = 0.1; # Courant-Friedrichs-Lewy factor — (Float64)
 h_save = 4e-2; # spatial grid spacing for saved data points [km] — (Float64)
 total_time_ms = 0.05; # total integration time [ms] — (Float64)
@@ -102,5 +99,4 @@ BDNK_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τ
             mode = 0; cowling = false;
             eigvec_ID_star = NeutronStarOscillations.Star(eps_central, kappa, n, η, ζ, τε, τP, τQ, L, ptol, ptol_TD, data_path, fig_path, TOV_iter_tol, TOV_max_iter, TOV_max_steps, TOV_initial_r, NL_reltol, NL_abstol, NL_maxiter, N_eigvals, mode, cowling, KO, CFL, dt_save_ms, h_save, save_every, total_time_ms);
 
-        Warning about (2): this function computes eigenvectors using the frequency domain code and then interpolates them to create initial data functions. If the time domain grid extends slightly beyond the frequency domain grid, an error will be thrown since the interpolation functions are not defined outside the frequency domain grid. To avoid this, make sure the frequency domain code is ran at a higher resolution than the time domain code with the same (or smaller) pressure tolerance.
 =#

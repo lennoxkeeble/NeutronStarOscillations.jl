@@ -1,7 +1,7 @@
 #=
 
     Module comprising of the discretized time evolution equations for the perfect fluid and BDNK systems in the Cowling approximation. These equations are integrated in time using
-    an RK4 scheme. This numerical scheme is second-second order accurate since we use second-order finite differences for spatial derivatives.
+    an RK4 scheme. This numerical scheme is second-order accurate since we use second-order finite differences for spatial derivatives.
 
 =#
 

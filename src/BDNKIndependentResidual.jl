@@ -1,10 +1,10 @@
 #=
-    Module comprising of functions which compute independent residuals of the BDNK equations of motion we solve. The BDNK system we solve consists of
-    two wave equations for the energy density and (radial component of the four-)velocity perturbations (δε, δu) and a constraint equation for the
-    metric (redshift) perturbation δλ. We solve this system with a Crank-Nicholson time discretization which couples time levels (n, n+1) by discretizing the equations at the half
+    Module comprising of functions which compute independent residuals of the BDNK equations of motion. The BDNK system we solve consists of
+    two wave equations for the energy density and velocity perturbations (δε, δu) and a constraint equation for the
+    metric perturbation δλ. We solve this system with a Crank-Nicholson time discretization which couples time levels (n, n+1) by discretizing the equations at the half
     time step n + 1/2 (t + Δt / 2) and then using a leapfrog stencil for time derivatives and averaging functions u[n+1/2,r] = (u[n+1,r] + u[n,r]) / 2. The independent
     residuals below discretize the equations in a distinct way, using a leapfrog scheme which couples time levels (n-1, n, n+1). Note that we monitor two sets of IRs: two for the constrained system
-    (we don't have three because when we cast the BDNK system in first-order form, the constraint equation contains no time derivatives), and three for the "wave-like" system. The
+    (we don't have three because when we cast the BDNK system in first-order form, the constraint equation contains no time derivatives), and three for the original "wave-like" system. The
     latter system is how the Einstein-BDNK system naturally falls out of the EFEs and conservation of energy-momentum, but we find that solving the constrained system is
     more numerically stable. We additionally check that the independent residual of the wave-like system converges in the continuum limit to ensure that we are solving the original equations
     before formulating them in the form of a constrained system.

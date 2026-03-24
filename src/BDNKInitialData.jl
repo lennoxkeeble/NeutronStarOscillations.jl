@@ -1,5 +1,5 @@
 #=
-    Module comprising of initial data solvers for the BDNK system. The Einstein-BDNK system consists of five equations: three second-order wave-like equations in the variables δu, δε, and δλ and two lower first-order constraint equations. The constraint equations reduce the number of variables for which we can freely specify initial data from six to four. The system we solve numerically is obtained by using one of the lower-order equations to eliminate time derivatives of δλ from all the equations, so in the final system we can sepcify initial data for only four of (δu, ∂_{t}δu, δε, ∂_{t}δε, δλ) since we have one remaining first-order constraint. We choose to specify intial data for δu, δε and their time derivatives, and use the constraint equation to solve for δλ.
+    Module comprising of initial data solvers for the BDNK system. We choose to specify intial data for δu, δε and their time derivatives. We numerically solve the lower-order constraint equation for δλ at t=0.
 =#
 
 module BDNKInitialData
@@ -9,39 +9,6 @@ using ..FiniteDiffOrder4
 using LaTeXStrings
 using Dierckx
 using NeutronStarOscillations
-
-# function plot_initial_data_convergence(r_lev1, var1_lev1, var2_lev1, r_lev2, var1_lev2, var2_lev2, r_lev3, var1_lev3, var2_lev3, var1_label, var2_label)
-#     # check convergence
-#     spline_order = 5; s = 0.0;
-#     var1_spline_2 = Spline1D(r_lev2, var1_lev2; k=spline_order, s=s);
-#     var2_spline_2 = Spline1D(r_lev2, var2_lev2; k=spline_order, s=s);
-#     var1_spline_3 = Spline1D(r_lev3, var1_lev3; k=spline_order, s=s);
-#     var2_spline_3 = Spline1D(r_lev3, var2_lev3; k=spline_order, s=s);
-
-#     var2_lev2_ds = [var2_spline_2(r) for r in r_lev1];
-#     var1_lev2_ds = [var1_spline_2(r) for r in r_lev1];
-#     var2_lev3_ds = [var2_spline_3(r) for r in r_lev1];
-#     var1_lev3_ds = [var1_spline_3(r) for r in r_lev1];
-
-#     Q_var1 = [abs(var1_lev1[i] - var1_lev2_ds[i]) / abs(var1_lev2_ds[i] - var1_lev3_ds[i]) for i in 1:length(var1_lev1)];
-#     Q_var2 = [abs(var2_lev1[i] - var2_lev2_ds[i]) / abs(var2_lev2_ds[i] - var2_lev3_ds[i]) for i in 1:length(var2_lev1)];
-
-#     plot_ds = 100;
-#     lim_x_min, lim_x_max, lim_y_min, lim_y_max = nothing, nothing, 0.0, 16.0;
-#     colors = [:tomato, :aquamarine4, :turquoise]
-#     linestyles = [:solid, :dash, :dot]
-#     linewidths = [2.0, 2.0, 2.0]
-#     alphas = [1.0, 1.0, 1.0]
-#     xlabel = L"r\,[\mathrm{km}]"
-
-#     labels = [var1_label, var2_label]
-#     QuickPlots.plot11([r_lev1[1:plot_ds:end], r_lev1[1:plot_ds:end]], [Q_var1[1:plot_ds:end], Q_var2[1:plot_ds:end]], colors, labels, linestyles, linewidths, alphas, xlabel, L"Q_{N}", lim_x_min, lim_x_max, lim_y_min, lim_y_max, identity; legend = true)
-
-#     lim_x_min, lim_x_max, lim_y_min, lim_y_max = nothing, nothing, nothing, nothing;
-#     labels = ["Low", "Med", "High"]
-#     QuickPlots.plot11([r_lev1[1:plot_ds:end], r_lev2[1:2*plot_ds:end], r_lev3[1:4*plot_ds:end]], [var1_lev1[1:plot_ds:end], var1_lev2[1:2*plot_ds:end], var1_lev3[1:4*plot_ds:end]], colors, labels, linestyles, linewidths, alphas, xlabel, var1_label, lim_x_min, lim_x_max, lim_y_min, lim_y_max, identity; legend = true, position = :lt)
-#     QuickPlots.plot11([r_lev1[1:plot_ds:end], r_lev2[1:2*plot_ds:end], r_lev3[1:4*plot_ds:end]], [var2_lev1[1:plot_ds:end], var2_lev2[1:2*plot_ds:end], var2_lev3[1:4*plot_ds:end]], colors, labels, linestyles, linewidths, alphas, xlabel, var2_label, lim_x_min, lim_x_max, lim_y_min, lim_y_max, identity; legend = true, position = :lb)
-# end
 
 # TOV functions
 p_prime(m::Float64, p::Float64, ε::Float64, r::Float64)::Float64 = -0.5*((-1 + r/(r - 2*m) + (8*π*r^3*p)/(r - 2*m))*(p + ε))/r
@@ -193,7 +160,6 @@ function integrate(u1::Vector{Float64}, u2::Vector{Float64}, w1::Vector{Float64}
         push!(rr, r0 + H);
         push!(u3, u3_0 + H/6*(k1 + 2*k2 + 2*k3 + k4));
     end
-    # return rr, u3, u2, m[1:2:end], p[1:2:end], ε[1:2:end], ν[1:2:end], cs[1:2:end], cs_prime[1:2:end];
     return rr, u3
 end
 
