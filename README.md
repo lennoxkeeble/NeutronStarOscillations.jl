@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 # NeutronStarOscillations
-Julia code for solving the equations of motion governing linearized radial perturbations of spherically symmetric neutron stars in the frequency and time domains. Methods are provided for inviscid perfect fluid (PF) stars and viscous stars within the frameworks of Eckart and Bemfica-Disconzi-Noronha-Kovtun (BDNK) hydrodynamics. Frequency-domain methods are provided for PF and Eckart stars. Time-domain methods are provided for all three fluid models. Currently, the code is restricted to cold, polytropic neutron stars with an equation of state of the form $p=\kappa \epsilon^{1+1/n}$. Example code is provided in the /src/Examples/ directory. For details about the numerical methods employed, see [arxiv:](arxiv.org).
+Julia code for solving the equations of motion governing linearized radial perturbations of spherically symmetric neutron stars in the frequency and time domains. Methods are provided for inviscid perfect fluid (PF) stars and viscous stars within the frameworks of Eckart and Bemfica-Disconzi-Noronha-Kovtun (BDNK) hydrodynamics. Frequency-domain methods are provided for PF and Eckart stars. Time-domain methods are provided for all three fluid models. Currently, the code is restricted to cold, polytropic neutron stars with an equation of state of the form $p=\kappa \epsilon^{1+1/n}$. Example code is provided in the /src/Examples/ directory.
 
 [Code in constant development.]
 
