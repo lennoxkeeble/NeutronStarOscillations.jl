@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/lennoxkeeble/NeutronStarOscillations.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 # NeutronStarOscillations
-Julia code for solving the equations of motion governing linearized radial perturbations of spherically symmetric neutron stars in the frequency and time domains. Methods are provided for inviscid perfect fluid (PF) stars and viscous stars within the frameworks of Eckart and Bemfica-Disconzi-Noronha-Kovtun (BDNK) hydrodynamics. Frequency-domain methods are provided for PF and Eckart stars. Time-domain methods are provided for all three fluid models. Currently, the code is restricted to cold, polytropic neutron stars with an equation of state of the form $p=\kappa \epsilon^{1+1/n}$. Example code is provided in the /src/Examples/ directory.
+Julia code for solving the equations of motion governing linearized radial perturbations of spherically symmetric neutron stars in the frequency and time domains. Methods are provided for inviscid perfect fluid (PF) stars and viscous stars within the frameworks of Eckart and Bemfica-Disconzi-Noronha-Kovtun (BDNK) hydrodynamics. Frequency-domain methods are provided for PF and Eckart stars. Time-domain methods are provided for all three fluid models. Currently, the code is restricted to cold, polytropic neutron stars with an equation of state of the form $p=\kappa \epsilon^{1+1/n}$. Example code is provided in the /src/Examples/ directory. For details about the numerical methods employed, see [arxiv:2603.23622](https://arxiv.org/abs/2603.23622).
 
 [Code in constant development.]
 
@@ -13,13 +13,14 @@ Julia code for solving the equations of motion governing linearized radial pertu
 If you use this code in your work, please cite the following reference:
 
 ```
-@article{Keeble:2026
-    author = "Keeble, Lennox and Redondo-Yuste, Jaime",
-    title = "{}",
-    eprint = "26",
-    archivePrefix = "arXiv",
-    primaryClass = "gr-qc",
-    year = "2026"
+@article{Keeble_2026,
+      title={Radial Oscillations of Viscous Stars}, 
+      author={Lennox S. Keeble and Jaime Redondo-Yuste},
+      year={2026},
+      eprint={2603.23622},
+      archivePrefix={arXiv},
+      primaryClass={gr-qc},
+      url={https://arxiv.org/abs/2603.23622}, 
 }
 ```
 
